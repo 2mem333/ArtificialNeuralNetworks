@@ -1,5 +1,6 @@
 #pragma once
 #include <iostream>
+#include <algorithm>
 
 namespace PredictMNIST {
 
@@ -25,7 +26,7 @@ namespace PredictMNIST {
 		}
 	private:
 		/// UDV User Defined Variables
-		float* input;
+		float* input = new float[28*28];
 		float* HiddenNeurons;
 		float* hbias;
 
@@ -36,13 +37,15 @@ namespace PredictMNIST {
 		float* std;
 		bool isNormalized;
 
+		bool weightsLoaded = false;
+
 		int oCount = 10;
 		int hCount = 64;
 
 	private: System::Windows::Forms::RichTextBox^ richTextBox1;
 	private: System::Windows::Forms::Button^ button1;
 	private: System::Windows::Forms::PictureBox^ pictureBox1;
-	private: System::Windows::Forms::Button^ button2;
+
 	private: System::Windows::Forms::Button^ button3;
 	private: System::Windows::Forms::Label^ label1;
 	private: System::Windows::Forms::Label^ label12;
@@ -59,6 +62,7 @@ namespace PredictMNIST {
 	private: System::Windows::Forms::Label^ label17;
 	private: System::Windows::Forms::Label^ label16;
 	private: System::Windows::Forms::Label^ label13;
+
 
 	private: System::Windows::Forms::Button^ Predict;
 
@@ -111,13 +115,14 @@ namespace PredictMNIST {
 
 	private: System::Windows::Forms::Label^ value8;
 	private: System::Windows::Forms::Button^ loadWeights;
+	private: System::ComponentModel::IContainer^ components;
 
 
 	private:
 		/// <summary>
 		/// Required designer variable.
 		/// </summary>
-		System::ComponentModel::Container^ components;
+
 
 #pragma region Windows Form Designer generated code
 		/// <summary>
@@ -152,7 +157,6 @@ namespace PredictMNIST {
 			this->richTextBox1 = (gcnew System::Windows::Forms::RichTextBox());
 			this->button1 = (gcnew System::Windows::Forms::Button());
 			this->pictureBox1 = (gcnew System::Windows::Forms::PictureBox());
-			this->button2 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->label1 = (gcnew System::Windows::Forms::Label());
 			this->label12 = (gcnew System::Windows::Forms::Label());
@@ -506,7 +510,7 @@ namespace PredictMNIST {
 			this->button1->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->button1->ForeColor = System::Drawing::Color::White;
-			this->button1->Location = System::Drawing::Point(309, 405);
+			this->button1->Location = System::Drawing::Point(399, 406);
 			this->button1->Name = L"button1";
 			this->button1->Size = System::Drawing::Size(81, 36);
 			this->button1->TabIndex = 26;
@@ -526,22 +530,6 @@ namespace PredictMNIST {
 			this->pictureBox1->MouseDown += gcnew System::Windows::Forms::MouseEventHandler(this, &Main::pictureBox1_MouseDown);
 			this->pictureBox1->MouseMove += gcnew System::Windows::Forms::MouseEventHandler(this, &Main::pictureBox1_MouseMove);
 			this->pictureBox1->MouseUp += gcnew System::Windows::Forms::MouseEventHandler(this, &Main::pictureBox1_MouseUp);
-			// 
-			// button2
-			// 
-			this->button2->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(58)), static_cast<System::Int32>(static_cast<System::Byte>(58)),
-				static_cast<System::Int32>(static_cast<System::Byte>(58)));
-			this->button2->FlatStyle = System::Windows::Forms::FlatStyle::Popup;
-			this->button2->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->button2->ForeColor = System::Drawing::Color::White;
-			this->button2->Location = System::Drawing::Point(396, 405);
-			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(81, 36);
-			this->button2->TabIndex = 28;
-			this->button2->Text = L"Load IFD";
-			this->button2->UseVisualStyleBackColor = false;
-			this->button2->Click += gcnew System::EventHandler(this, &Main::button2_Click);
 			// 
 			// button3
 			// 
@@ -756,7 +744,6 @@ namespace PredictMNIST {
 			this->Controls->Add(this->label12);
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->button3);
-			this->Controls->Add(this->button2);
 			this->Controls->Add(this->button1);
 			this->Controls->Add(this->loadWeights);
 			this->Controls->Add(this->LoadInput);
@@ -764,6 +751,7 @@ namespace PredictMNIST {
 			this->Name = L"Main";
 			this->ShowIcon = false;
 			this->Text = L"Main";
+			this->Load += gcnew System::EventHandler(this, &Main::Main_Load);
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->EndInit();
 			this->panel1->ResumeLayout(false);
 			this->panel2->ResumeLayout(false);
@@ -842,7 +830,10 @@ namespace PredictMNIST {
 
 			label15->Text = "True";
 			label15->ForeColor = Color::Green;
+			weightsLoaded = true;
+
 			std::cout << "Done reading weights!\n";
+
 		}
 	}
 
@@ -874,15 +865,17 @@ namespace PredictMNIST {
 			richTextBox1->Clear();
 			for (int y = 0; y < 28; y++)
 				for (int x = 0; x < 28; x++) {
-					pixels[x, y] = input[x + y * 28];
 					richTextBox1->AppendText(System::Convert::ToString(input[y * 28 + x]) + " ");
 				}
 			pictureBox1->Invalidate(); // Çizimi yenile
-
 			std::cout << "Done reading input!\n";
 		}
 	}
 private: System::Void Predict_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	if (!weightsLoaded)
+		return;
+
 	float* Hnet = new float[hCount];
 	float* Hfnet = new float[hCount];
 
@@ -988,20 +981,13 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 
 	isNormalized = false;
 
-	//picture box'a ciz
-	for (int y = 0; y < 28; y++)
-		for (int x = 0; x < 28; x++)
-			pixels[x, y] = input[x+y*28];
 	pictureBox1->Invalidate(); // Çizimi yenile
 
 	std::cout << "Done reading input!\n";
-
-
 }
 
 
 bool isDrawing = false;
-array<int, 2>^ pixels = gcnew array<int, 2>(28, 28);
 private: System::Void pictureBox1_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
 	Graphics^ g = e->Graphics;
 	g->FillRectangle(Brushes::Black, 0, 0, 280, 280);
@@ -1010,7 +996,7 @@ private: System::Void pictureBox1_Paint(System::Object^ sender, System::Windows:
 	{
 		for (int x = 0; x < 28; x++)
 		{
-			int val = pixels[x, y];  // 0–255
+			int val = input[x+y*28];
 			Color c = Color::FromArgb(val, val, val);
 			Brush^ b = gcnew SolidBrush(c);
 			g->FillRectangle(b, x * 10, y * 10, 10, 10);
@@ -1046,11 +1032,11 @@ private: System::Void pictureBox1_MouseMove(System::Object^ sender, System::Wind
 
 				if (addVal < 0) addVal = 0;
 
-				pixels[xx, yy] = Math::Min(pixels[xx, yy] + addVal, 255);
+				input[xx + yy*28] = std::min(input[xx + yy * 28] + addVal, 255.0f);
 			}
 		}
 	}
-
+	//std::cout << "deneme";
 	pictureBox1->Invalidate();
 }
 private: System::Void pictureBox1_MouseUp(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
@@ -1059,24 +1045,25 @@ private: System::Void pictureBox1_MouseUp(System::Object^ sender, System::Window
 
 
 private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
-	if (input) { delete[] input; input = nullptr; }
-	input = new float[784];
 
 	richTextBox1->Clear();
 	for (int y = 0; y < 28; y++)
 		for (int x = 0; x < 28; x++) {
-			input[y * 28 + x] = pixels[x, y];
 			richTextBox1->AppendText(System::Convert::ToString(input[y * 28 + x]) + " ");
 		}
 
 	std::cout << "Loaded input from drawing!\n";
 }
 private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
-	for (int y = 0; y < 28; y++)
-		for (int x = 0; x < 28; x++)
-			pixels[x, y] = 0;
+	for (int i = 0; i < 784; i++)
+			input[i] = 0;
 
 	pictureBox1->Invalidate(); // ekraný yeniden çiz
 }
+private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
+	for (int i = 0; i < 784; i++)
+		input[i] = 0;
+}
+
 };
 }
