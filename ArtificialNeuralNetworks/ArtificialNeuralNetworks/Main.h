@@ -1,0 +1,868 @@
+#pragma once
+#include <iostream>  //for debugging
+#include "PerpectionLearning.h"
+#include "DeltaLearning.h"
+#include "SingleLayerNetwork.h"
+#include "Regression.h"
+
+namespace ArtificialNeuralNetworks {
+
+	using namespace System;
+	using namespace System::ComponentModel;
+	using namespace System::Collections;
+	using namespace System::Windows::Forms;
+	using namespace System::Data;
+	using namespace System::Drawing;
+
+	/// <summary>
+	/// Summary for Main
+	/// </summary>
+	public ref class Main : public System::Windows::Forms::Form
+	{
+	public:
+		Main(void)
+		{
+			InitializeComponent();
+			//
+			//TODO: Add the constructor code here
+			//
+		}
+
+	protected:
+		/// <summary>
+		/// Clean up any resources being used.
+		/// </summary>
+		~Main()
+		{
+			if (components)
+			{
+				delete components;
+			}
+		}
+	private:
+		/// UDV User Defined Variables
+		float* inputs;
+		int addedInputCount = 0;
+		int dimension = 2;
+		int classCount = 2; //initial value
+
+		int selectedClass = -1;
+		float* weights;
+		float* bias;
+
+
+	private: System::Windows::Forms::PictureBox^ coordinate;
+
+	protected:
+
+	protected:
+
+
+
+
+	private: System::Windows::Forms::Button^ testResults;
+	private: System::Windows::Forms::TabPage^ tabPage2;
+	private: System::Windows::Forms::Button^ StartLearningDelta;
+	private: System::Windows::Forms::TabPage^ tabPage1;
+	private: System::Windows::Forms::Button^ StartLearningPerpection;
+	private: System::Windows::Forms::TabControl^ tabControl1;
+	private: System::Windows::Forms::TabPage^ tabPage5;
+	private: System::Windows::Forms::TabControl^ tabControl2;
+	private: System::Windows::Forms::TabPage^ tabPage3;
+	private: System::Windows::Forms::TabPage^ tabPage4;
+
+	private: System::Windows::Forms::Button^ StartLearningSingleLayer;
+	private: System::Windows::Forms::Label^ label2;
+	private: System::Windows::Forms::TextBox^ textBox1;
+	private: System::Windows::Forms::Button^ TestSingleLayer;
+
+
+	private: System::Windows::Forms::ComboBox^ comboBox1;
+	private: System::Windows::Forms::Label^ label3;
+	private: System::Windows::Forms::Button^ Clear;
+	private: System::Windows::Forms::Button^ saveInputs;
+	private: System::Windows::Forms::Button^ StartRegression;
+	private: System::Windows::Forms::Label^ label5;
+	private: System::Windows::Forms::TextBox^ textBox3;
+	private: System::Windows::Forms::Label^ label4;
+	private: System::Windows::Forms::TextBox^ textBox2;
+	private: System::Windows::Forms::Label^ label6;
+	private: System::Windows::Forms::TextBox^ textBox4;
+	private: System::Windows::Forms::Button^ loadInputs;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	protected:
+
+	protected:
+
+
+
+	private:
+		/// <summary>
+		/// Required designer variable.
+		/// </summary>
+		System::ComponentModel::Container ^components;
+
+#pragma region Windows Form Designer generated code
+		/// <summary>
+		/// Required method for Designer support - do not modify
+		/// the contents of this method with the code editor.
+		/// </summary>
+		void InitializeComponent(void)
+		{
+			this->coordinate = (gcnew System::Windows::Forms::PictureBox());
+			this->testResults = (gcnew System::Windows::Forms::Button());
+			this->tabPage2 = (gcnew System::Windows::Forms::TabPage());
+			this->StartLearningDelta = (gcnew System::Windows::Forms::Button());
+			this->tabPage1 = (gcnew System::Windows::Forms::TabPage());
+			this->StartLearningPerpection = (gcnew System::Windows::Forms::Button());
+			this->tabControl1 = (gcnew System::Windows::Forms::TabControl());
+			this->tabPage5 = (gcnew System::Windows::Forms::TabPage());
+			this->StartRegression = (gcnew System::Windows::Forms::Button());
+			this->label6 = (gcnew System::Windows::Forms::Label());
+			this->textBox4 = (gcnew System::Windows::Forms::TextBox());
+			this->label5 = (gcnew System::Windows::Forms::Label());
+			this->textBox3 = (gcnew System::Windows::Forms::TextBox());
+			this->label4 = (gcnew System::Windows::Forms::Label());
+			this->textBox2 = (gcnew System::Windows::Forms::TextBox());
+			this->tabControl2 = (gcnew System::Windows::Forms::TabControl());
+			this->tabPage3 = (gcnew System::Windows::Forms::TabPage());
+			this->comboBox1 = (gcnew System::Windows::Forms::ComboBox());
+			this->label3 = (gcnew System::Windows::Forms::Label());
+			this->label2 = (gcnew System::Windows::Forms::Label());
+			this->textBox1 = (gcnew System::Windows::Forms::TextBox());
+			this->StartLearningSingleLayer = (gcnew System::Windows::Forms::Button());
+			this->tabPage4 = (gcnew System::Windows::Forms::TabPage());
+			this->TestSingleLayer = (gcnew System::Windows::Forms::Button());
+			this->Clear = (gcnew System::Windows::Forms::Button());
+			this->saveInputs = (gcnew System::Windows::Forms::Button());
+			this->loadInputs = (gcnew System::Windows::Forms::Button());
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->coordinate))->BeginInit();
+			this->tabPage2->SuspendLayout();
+			this->tabPage1->SuspendLayout();
+			this->tabControl1->SuspendLayout();
+			this->tabPage5->SuspendLayout();
+			this->tabControl2->SuspendLayout();
+			this->tabPage3->SuspendLayout();
+			this->SuspendLayout();
+			// 
+			// coordinate
+			// 
+			this->coordinate->BackColor = System::Drawing::SystemColors::HighlightText;
+			this->coordinate->Location = System::Drawing::Point(12, 30);
+			this->coordinate->Name = L"coordinate";
+			this->coordinate->Size = System::Drawing::Size(594, 459);
+			this->coordinate->TabIndex = 0;
+			this->coordinate->TabStop = false;
+			this->coordinate->Paint += gcnew System::Windows::Forms::PaintEventHandler(this, &Main::coordinate_Paint);
+			this->coordinate->MouseClick += gcnew System::Windows::Forms::MouseEventHandler(this, &Main::coordinate_MouseClick);
+			// 
+			// testResults
+			// 
+			this->testResults->Location = System::Drawing::Point(656, 493);
+			this->testResults->Name = L"testResults";
+			this->testResults->Size = System::Drawing::Size(110, 42);
+			this->testResults->TabIndex = 4;
+			this->testResults->Text = L"Test Results";
+			this->testResults->UseVisualStyleBackColor = true;
+			this->testResults->Click += gcnew System::EventHandler(this, &Main::testResults_Click);
+			// 
+			// tabPage2
+			// 
+			this->tabPage2->Controls->Add(this->StartLearningDelta);
+			this->tabPage2->Location = System::Drawing::Point(4, 28);
+			this->tabPage2->Name = L"tabPage2";
+			this->tabPage2->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage2->Size = System::Drawing::Size(303, 124);
+			this->tabPage2->TabIndex = 1;
+			this->tabPage2->Text = L"Delta Learning";
+			this->tabPage2->UseVisualStyleBackColor = true;
+			// 
+			// StartLearningDelta
+			// 
+			this->StartLearningDelta->Location = System::Drawing::Point(93, 74);
+			this->StartLearningDelta->Name = L"StartLearningDelta";
+			this->StartLearningDelta->Size = System::Drawing::Size(105, 34);
+			this->StartLearningDelta->TabIndex = 6;
+			this->StartLearningDelta->Text = L"Start Learning";
+			this->StartLearningDelta->UseVisualStyleBackColor = true;
+			this->StartLearningDelta->Click += gcnew System::EventHandler(this, &Main::StartLearningDelta_Click);
+			// 
+			// tabPage1
+			// 
+			this->tabPage1->Controls->Add(this->StartLearningPerpection);
+			this->tabPage1->Location = System::Drawing::Point(4, 28);
+			this->tabPage1->Name = L"tabPage1";
+			this->tabPage1->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage1->Size = System::Drawing::Size(303, 124);
+			this->tabPage1->TabIndex = 0;
+			this->tabPage1->Text = L"Perpection";
+			this->tabPage1->UseVisualStyleBackColor = true;
+			// 
+			// StartLearningPerpection
+			// 
+			this->StartLearningPerpection->Location = System::Drawing::Point(91, 67);
+			this->StartLearningPerpection->Name = L"StartLearningPerpection";
+			this->StartLearningPerpection->Size = System::Drawing::Size(107, 38);
+			this->StartLearningPerpection->TabIndex = 2;
+			this->StartLearningPerpection->Text = L"Start Learning";
+			this->StartLearningPerpection->UseVisualStyleBackColor = true;
+			this->StartLearningPerpection->Click += gcnew System::EventHandler(this, &Main::StartLearningPerpection_Click);
+			// 
+			// tabControl1
+			// 
+			this->tabControl1->Controls->Add(this->tabPage1);
+			this->tabControl1->Controls->Add(this->tabPage2);
+			this->tabControl1->Controls->Add(this->tabPage5);
+			this->tabControl1->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8.25F));
+			this->tabControl1->Location = System::Drawing::Point(659, 123);
+			this->tabControl1->Name = L"tabControl1";
+			this->tabControl1->SelectedIndex = 0;
+			this->tabControl1->Size = System::Drawing::Size(311, 156);
+			this->tabControl1->TabIndex = 5;
+			// 
+			// tabPage5
+			// 
+			this->tabPage5->Controls->Add(this->StartRegression);
+			this->tabPage5->Location = System::Drawing::Point(4, 28);
+			this->tabPage5->Name = L"tabPage5";
+			this->tabPage5->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage5->Size = System::Drawing::Size(303, 124);
+			this->tabPage5->TabIndex = 2;
+			this->tabPage5->Text = L"Regression";
+			this->tabPage5->UseVisualStyleBackColor = true;
+			// 
+			// StartRegression
+			// 
+			this->StartRegression->Location = System::Drawing::Point(178, 94);
+			this->StartRegression->Name = L"StartRegression";
+			this->StartRegression->Size = System::Drawing::Size(107, 24);
+			this->StartRegression->TabIndex = 3;
+			this->StartRegression->Text = L"Start Learning";
+			this->StartRegression->UseVisualStyleBackColor = true;
+			this->StartRegression->Click += gcnew System::EventHandler(this, &Main::StartRegression_Click);
+			// 
+			// label6
+			// 
+			this->label6->AutoSize = true;
+			this->label6->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label6->Location = System::Drawing::Point(665, 77);
+			this->label6->Name = L"label6";
+			this->label6->Size = System::Drawing::Size(28, 20);
+			this->label6->TabIndex = 15;
+			this->label6->Text = L"LC";
+			// 
+			// textBox4
+			// 
+			this->textBox4->Location = System::Drawing::Point(770, 77);
+			this->textBox4->Name = L"textBox4";
+			this->textBox4->Size = System::Drawing::Size(110, 22);
+			this->textBox4->TabIndex = 14;
+			this->textBox4->Text = L"0,1";
+			// 
+			// label5
+			// 
+			this->label5->AutoSize = true;
+			this->label5->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label5->Location = System::Drawing::Point(665, 48);
+			this->label5->Name = L"label5";
+			this->label5->Size = System::Drawing::Size(92, 20);
+			this->label5->TabIndex = 13;
+			this->label5->Text = L"Max Epoch";
+			// 
+			// textBox3
+			// 
+			this->textBox3->Location = System::Drawing::Point(770, 48);
+			this->textBox3->Name = L"textBox3";
+			this->textBox3->Size = System::Drawing::Size(110, 22);
+			this->textBox3->TabIndex = 12;
+			this->textBox3->Text = L"1000";
+			// 
+			// label4
+			// 
+			this->label4->AutoSize = true;
+			this->label4->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label4->Location = System::Drawing::Point(665, 18);
+			this->label4->Name = L"label4";
+			this->label4->Size = System::Drawing::Size(73, 20);
+			this->label4->TabIndex = 11;
+			this->label4->Text = L"Min Error";
+			// 
+			// textBox2
+			// 
+			this->textBox2->Location = System::Drawing::Point(770, 18);
+			this->textBox2->Name = L"textBox2";
+			this->textBox2->Size = System::Drawing::Size(110, 22);
+			this->textBox2->TabIndex = 10;
+			this->textBox2->Text = L"0,01";
+			// 
+			// tabControl2
+			// 
+			this->tabControl2->Controls->Add(this->tabPage3);
+			this->tabControl2->Controls->Add(this->tabPage4);
+			this->tabControl2->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->tabControl2->Location = System::Drawing::Point(655, 294);
+			this->tabControl2->Name = L"tabControl2";
+			this->tabControl2->SelectedIndex = 0;
+			this->tabControl2->Size = System::Drawing::Size(307, 181);
+			this->tabControl2->TabIndex = 6;
+			// 
+			// tabPage3
+			// 
+			this->tabPage3->Controls->Add(this->comboBox1);
+			this->tabPage3->Controls->Add(this->label3);
+			this->tabPage3->Controls->Add(this->label2);
+			this->tabPage3->Controls->Add(this->textBox1);
+			this->tabPage3->Controls->Add(this->StartLearningSingleLayer);
+			this->tabPage3->Location = System::Drawing::Point(4, 26);
+			this->tabPage3->Name = L"tabPage3";
+			this->tabPage3->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage3->Size = System::Drawing::Size(299, 151);
+			this->tabPage3->TabIndex = 0;
+			this->tabPage3->Text = L"Single Layer";
+			this->tabPage3->UseVisualStyleBackColor = true;
+			// 
+			// comboBox1
+			// 
+			this->comboBox1->FormattingEnabled = true;
+			this->comboBox1->Location = System::Drawing::Point(111, 51);
+			this->comboBox1->Name = L"comboBox1";
+			this->comboBox1->Size = System::Drawing::Size(121, 25);
+			this->comboBox1->TabIndex = 10;
+			this->comboBox1->SelectedIndexChanged += gcnew System::EventHandler(this, &Main::comboBox1_SelectedIndexChanged);
+			// 
+			// label3
+			// 
+			this->label3->AutoSize = true;
+			this->label3->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label3->Location = System::Drawing::Point(6, 51);
+			this->label3->Name = L"label3";
+			this->label3->Size = System::Drawing::Size(99, 20);
+			this->label3->TabIndex = 9;
+			this->label3->Text = L"Select Class:";
+			// 
+			// label2
+			// 
+			this->label2->AutoSize = true;
+			this->label2->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label2->Location = System::Drawing::Point(6, 12);
+			this->label2->Name = L"label2";
+			this->label2->Size = System::Drawing::Size(99, 20);
+			this->label2->TabIndex = 9;
+			this->label2->Text = L"Class Count:";
+			// 
+			// textBox1
+			// 
+			this->textBox1->Location = System::Drawing::Point(111, 12);
+			this->textBox1->Name = L"textBox1";
+			this->textBox1->Size = System::Drawing::Size(110, 23);
+			this->textBox1->TabIndex = 8;
+			this->textBox1->Text = L"0";
+			this->textBox1->TextChanged += gcnew System::EventHandler(this, &Main::textBox1_TextChanged);
+			// 
+			// StartLearningSingleLayer
+			// 
+			this->StartLearningSingleLayer->Location = System::Drawing::Point(10, 98);
+			this->StartLearningSingleLayer->Name = L"StartLearningSingleLayer";
+			this->StartLearningSingleLayer->Size = System::Drawing::Size(107, 38);
+			this->StartLearningSingleLayer->TabIndex = 3;
+			this->StartLearningSingleLayer->Text = L"Start Learning";
+			this->StartLearningSingleLayer->UseVisualStyleBackColor = true;
+			this->StartLearningSingleLayer->Click += gcnew System::EventHandler(this, &Main::StartLearningSingleLayer_Click);
+			// 
+			// tabPage4
+			// 
+			this->tabPage4->Location = System::Drawing::Point(4, 26);
+			this->tabPage4->Name = L"tabPage4";
+			this->tabPage4->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage4->Size = System::Drawing::Size(299, 151);
+			this->tabPage4->TabIndex = 1;
+			this->tabPage4->Text = L"Multi Layer";
+			this->tabPage4->UseVisualStyleBackColor = true;
+			// 
+			// TestSingleLayer
+			// 
+			this->TestSingleLayer->Location = System::Drawing::Point(772, 495);
+			this->TestSingleLayer->Name = L"TestSingleLayer";
+			this->TestSingleLayer->Size = System::Drawing::Size(98, 42);
+			this->TestSingleLayer->TabIndex = 8;
+			this->TestSingleLayer->Text = L"Test Single Layer";
+			this->TestSingleLayer->UseVisualStyleBackColor = true;
+			this->TestSingleLayer->Click += gcnew System::EventHandler(this, &Main::TestSingleLayer_Click);
+			// 
+			// Clear
+			// 
+			this->Clear->Location = System::Drawing::Point(876, 495);
+			this->Clear->Name = L"Clear";
+			this->Clear->Size = System::Drawing::Size(98, 42);
+			this->Clear->TabIndex = 9;
+			this->Clear->Text = L"Clear";
+			this->Clear->UseVisualStyleBackColor = true;
+			this->Clear->Click += gcnew System::EventHandler(this, &Main::Clear_Click);
+			// 
+			// saveInputs
+			// 
+			this->saveInputs->Location = System::Drawing::Point(12, 495);
+			this->saveInputs->Name = L"saveInputs";
+			this->saveInputs->Size = System::Drawing::Size(75, 40);
+			this->saveInputs->TabIndex = 10;
+			this->saveInputs->Text = L"Save Inputs";
+			this->saveInputs->UseVisualStyleBackColor = true;
+			this->saveInputs->Click += gcnew System::EventHandler(this, &Main::saveInputs_Click);
+			// 
+			// loadInputs
+			// 
+			this->loadInputs->Location = System::Drawing::Point(93, 495);
+			this->loadInputs->Name = L"loadInputs";
+			this->loadInputs->Size = System::Drawing::Size(75, 40);
+			this->loadInputs->TabIndex = 16;
+			this->loadInputs->Text = L"Load Inputs";
+			this->loadInputs->UseVisualStyleBackColor = true;
+			this->loadInputs->Click += gcnew System::EventHandler(this, &Main::loadInputs_Click);
+			// 
+			// Main
+			// 
+			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
+			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Dpi;
+			this->ClientSize = System::Drawing::Size(1045, 547);
+			this->Controls->Add(this->loadInputs);
+			this->Controls->Add(this->label6);
+			this->Controls->Add(this->saveInputs);
+			this->Controls->Add(this->textBox4);
+			this->Controls->Add(this->Clear);
+			this->Controls->Add(this->label5);
+			this->Controls->Add(this->TestSingleLayer);
+			this->Controls->Add(this->textBox3);
+			this->Controls->Add(this->tabControl2);
+			this->Controls->Add(this->label4);
+			this->Controls->Add(this->textBox2);
+			this->Controls->Add(this->tabControl1);
+			this->Controls->Add(this->testResults);
+			this->Controls->Add(this->coordinate);
+			this->FormBorderStyle = System::Windows::Forms::FormBorderStyle::FixedSingle;
+			this->Name = L"Main";
+			this->ShowIcon = false;
+			this->Text = L"Artificial Neural Networks";
+			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->coordinate))->EndInit();
+			this->tabPage2->ResumeLayout(false);
+			this->tabPage1->ResumeLayout(false);
+			this->tabControl1->ResumeLayout(false);
+			this->tabPage5->ResumeLayout(false);
+			this->tabControl2->ResumeLayout(false);
+			this->tabPage3->ResumeLayout(false);
+			this->tabPage3->PerformLayout();
+			this->ResumeLayout(false);
+			this->PerformLayout();
+
+		}
+#pragma endregion
+		void draw_sample(int temp_x, int temp_y, int label) {
+			Pen^ pen;
+			switch (label) { //ilgili label'e gore renk ayarlar.
+			case 0: pen = gcnew Pen(Color::Black, 3.0f); break;
+			case 1: pen = gcnew Pen(Color::Red, 3.0f); break;
+			case 2: pen = gcnew Pen(Color::Blue, 3.0f); break;
+			case 3: pen = gcnew Pen(Color::Green, 3.0f); break;
+			case 4: pen = gcnew Pen(Color::Yellow, 3.0f); break;
+			case 5: pen = gcnew Pen(Color::Orange, 3.0f); break;
+			default: pen = gcnew Pen(Color::YellowGreen, 3.0f);
+			}
+			coordinate->CreateGraphics()->DrawLine(pen, temp_x - 5, temp_y, temp_x + 5, temp_y);
+			coordinate->CreateGraphics()->DrawLine(pen, temp_x, temp_y - 5, temp_x, temp_y + 5);
+		}
+
+		float* addInput(float* inputs, int x, int y, int label) {
+			float* temp;
+			temp = new float[(addedInputCount+1) * (dimension+1)]; 
+
+			//copy all inputs to temp.
+			for (int i = 0; i < addedInputCount; i++)
+				for(int d = 0; d < dimension+1; d++)
+				temp[i + d*(addedInputCount+1)] = inputs[i + d * (addedInputCount)];  
+			
+				temp[(addedInputCount) + 0 * (addedInputCount + 1)] = x;
+				temp[(addedInputCount) + 1 * (addedInputCount + 1)] = y;
+				temp[(addedInputCount) + 2 * (addedInputCount + 1)] = label;
+				//    sutundaki input indeksi        satirdaki dimension indeks
+
+			delete[] inputs;
+			return temp;
+		}
+
+
+	private: System::Void coordinate_MouseClick(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		
+		if (selectedClass == -1)
+		{
+			return;
+		}
+		int temp_x = (System::Convert::ToInt32(e->X));
+		int temp_y = (System::Convert::ToInt32(e->Y));
+
+		draw_sample(temp_x, temp_y, selectedClass);
+
+		temp_x = temp_x - (coordinate->Width / 2);
+		temp_y = coordinate->Height / 2 - temp_y;
+		inputs = addInput(inputs, temp_x, temp_y, selectedClass);
+		addedInputCount++;
+
+	}
+	private: System::Void coordinate_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		Pen^ pen = gcnew Pen(Color::Black, 3.0f);
+		int center_width, center_height;
+		center_width = (int)(coordinate->Width / 2);
+		center_height = (int)(coordinate->Height / 2);
+		e->Graphics->DrawLine(pen, center_width, 0, center_width, coordinate->Height);
+		e->Graphics->DrawLine(pen, 0, center_height, coordinate->Width, center_height);
+	}
+	
+    private: System::Void StartLearningPerpection_Click(System::Object^ sender, System::EventArgs^ e) {
+
+		PERPECTION_Neuron neuron(dimension, addedInputCount, 0.1f);
+		neuron.giveInputs(inputs);
+		neuron.initializeWeights();
+		neuron.printInputs();
+		neuron.printWeights();
+		float cycle = neuron.startLearning();
+		std::cout << "Finished in: " << cycle << " cycle!\n";
+		neuron.printWeights();
+
+		weights = neuron.returnWeights();
+		bias = neuron.returnBias();
+
+}
+private: System::Void testResults_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	Bitmap^ surface = gcnew Bitmap(coordinate->Width, coordinate->Height);
+	Graphics^ g = Graphics::FromImage(surface);
+	// merkez
+	int cx = surface->Width / 2;
+	int cy = surface->Height / 2;
+	// eksen çiz
+	Pen^ axis = gcnew Pen(Color::Black, 2.0f);
+	g->DrawLine(axis, cx, 0, cx, surface->Height);
+	g->DrawLine(axis, 0, cy, surface->Width, cy);
+	//inputlari cizdiririz
+	for (int inputInd = 0; inputInd < addedInputCount; inputInd++)
+	{
+		int label = inputs[inputInd + dimension * addedInputCount];
+		Pen^ pen;
+		switch (label) { //ilgili label'e gore renk ayarlar.
+		case 0: pen = gcnew Pen(Color::Black, 3.0f); break;
+		case 1: pen = gcnew Pen(Color::Red, 3.0f); break;
+		case 2: pen = gcnew Pen(Color::Blue, 3.0f); break;
+		case 3: pen = gcnew Pen(Color::Green, 3.0f); break;
+		case 4: pen = gcnew Pen(Color::Yellow, 3.0f); break;
+		case 5: pen = gcnew Pen(Color::Orange, 3.0f); break;
+		default: pen = gcnew Pen(Color::YellowGreen, 3.0f);
+		}
+
+		int temp_x = inputs[inputInd + 0 * addedInputCount] + (coordinate->Width / 2);
+		int temp_y = -(inputs[inputInd + 1 * addedInputCount]) + coordinate->Height / 2;
+
+		g->DrawLine(pen, temp_x - 5, temp_y, temp_x + 5, temp_y);
+		g->DrawLine(pen, temp_x, temp_y - 5, temp_x, temp_y + 5);
+	}
+
+	//DOGRULARI CIZ
+	float x = weights[0];
+	float y = weights[1];
+	float c = bias[0];
+	// w0 * x + w1 * y + b = 0
+
+	x = -x / y;
+	c = -c / y;
+	//y = x + c
+	std::cout << "y = " << x << "x + " << c << "\n";
+
+
+	float slope = x;
+	float intercept = c;
+
+	float X1 = -cx;
+	float X2 = cx;
+
+	float Y1 = slope * X1 + intercept;
+	float Y2 = slope * X2 + intercept;
+
+	int sx1 = cx + X1;
+	int sy1 = cy - Y1;
+
+	int sx2 = cx + X2;
+	int sy2 = cy - Y2;
+
+	Pen^ linePen = gcnew Pen(Color::Red, 2.0f);
+	g->DrawLine(linePen, sx1, sy1, sx2, sy2);
+
+
+
+	coordinate->Image = surface;
+
+}
+
+private: System::Void StartLearningDelta_Click(System::Object^ sender, System::EventArgs^ e) {
+	DeltaLearning_Neuron neuron(dimension, addedInputCount, 0.1f);
+	neuron.giveInputs(inputs);
+	neuron.initializeWeights();
+	neuron.printInputs();
+	neuron.printWeights();
+	float cycle = neuron.startLearning();
+	std::cout << "Finished in: " << cycle << " cycle!\n";
+	neuron.printWeights();
+
+	weights = neuron.returnWeights();
+	bias = neuron.returnBias();
+
+
+}
+
+private: System::Void StartLearningSingleLayer_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	float minError = System::Convert::ToSingle(textBox2->Text);
+	float maxEpoch = System::Convert::ToSingle(textBox3->Text);
+	float lc = System::Convert::ToSingle(textBox4->Text);
+	std::cout << "Learninc C: " << lc << "\n";
+	std::cout << "maxEpoch: " << maxEpoch << "\n";
+	std::cout << "minError: " << minError << "\n";
+
+	SingleLayerNetwork neuron(dimension, addedInputCount, classCount);
+	neuron.giveInputs(inputs);
+	neuron.initializeWeights();
+	neuron.initializeBias();
+	neuron.printInputs();
+	neuron.printWeights();
+
+	float cycle = neuron.StartLearning(minError,maxEpoch);
+	std::cout << "Finished in: " << cycle << " cycle!\n";
+	neuron.printWeights();
+
+	weights = neuron.returnWeights();
+	bias = neuron.returnBias();
+
+}
+private: System::Void TestSingleLayer_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	Bitmap^ surface = gcnew Bitmap(coordinate->Width, coordinate->Height);
+	Graphics^ g = Graphics::FromImage(surface);
+	// merkez
+	int cx = surface->Width / 2;
+	int cy = surface->Height / 2;
+	// eksen çiz
+	Pen^ axis = gcnew Pen(Color::Black, 2.0f);
+	g->DrawLine(axis, cx, 0, cx, surface->Height);
+	g->DrawLine(axis, 0, cy, surface->Width, cy);
+	//inputlari cizdiririz
+	for (int inputInd = 0; inputInd < addedInputCount; inputInd++)
+	{
+		int label = inputs[inputInd + dimension * addedInputCount];
+		Pen^ pen;
+		switch (label) { //ilgili label'e gore renk ayarlar.
+		case 0: pen = gcnew Pen(Color::Black, 3.0f); break;
+		case 1: pen = gcnew Pen(Color::Red, 3.0f); break;
+		case 2: pen = gcnew Pen(Color::Blue, 3.0f); break;
+		case 3: pen = gcnew Pen(Color::Green, 3.0f); break;
+		case 4: pen = gcnew Pen(Color::Yellow, 3.0f); break;
+		case 5: pen = gcnew Pen(Color::Orange, 3.0f); break;
+		default: pen = gcnew Pen(Color::YellowGreen, 3.0f);
+		}
+
+		int temp_x = inputs[inputInd + 0 * addedInputCount] + (coordinate->Width / 2);
+		int temp_y = -(inputs[inputInd + 1 * addedInputCount]) + coordinate->Height / 2;
+
+		g->DrawLine(pen, temp_x - 5, temp_y, temp_x + 5, temp_y);
+		g->DrawLine(pen, temp_x, temp_y - 5, temp_x, temp_y + 5);
+	}
+
+	for (int neuronInd = 0; neuronInd < classCount; neuronInd++)
+	{
+		//DOGRULARI CIZ  (dimension = 2'ye gore ayarlandi..)
+		float x = weights[neuronInd + 0 * classCount];
+		float y = weights[neuronInd + 1 * classCount];
+
+		float c = bias[neuronInd];
+		// w0 * x + w1 * y + b = 0
+
+		x = -x / y;
+		c = -c / y;
+		//y = x + c
+		std::cout << "Neuron: " << neuronInd << ":  y = " << x << "x + " << c << "\n";
+		
+
+		float slope = x;
+		float intercept = c;
+
+		float X1 = -cx;
+		float X2 = cx;
+
+		float Y1 = slope * X1 + intercept;
+		float Y2 = slope * X2 + intercept;
+
+		int sx1 = cx + X1;
+		int sy1 = cy - Y1;
+
+		int sx2 = cx + X2;
+		int sy2 = cy - Y2;
+
+		Pen^ linePen;
+		switch (neuronInd) { 
+		case 0: linePen = gcnew Pen(Color::Black, 3.0f); break;
+		case 1: linePen = gcnew Pen(Color::Red, 3.0f); break;
+		case 2: linePen = gcnew Pen(Color::Blue, 3.0f); break;
+		case 3: linePen = gcnew Pen(Color::Green, 3.0f); break;
+		case 4: linePen = gcnew Pen(Color::Yellow, 3.0f); break;
+		case 5: linePen = gcnew Pen(Color::Orange, 3.0f); break;
+		default: linePen = gcnew Pen(Color::YellowGreen, 3.0f);
+		}
+		g->DrawLine(linePen, sx1, sy1, sx2, sy2);
+	}
+
+
+	coordinate->Image = surface;
+}
+private: System::Void textBox1_TextChanged(System::Object^ sender, System::EventArgs^ e) {
+	int classC = System::Convert::ToInt32(textBox1->Text);
+	classCount = classC;
+
+	comboBox1->Items->Clear();
+
+	for (int i = 0; i < classCount; i++)
+		comboBox1->Items->Add("Class " + i);
+
+	comboBox1->SelectedIndex = 0;
+}
+private: System::Void comboBox1_SelectedIndexChanged(System::Object^ sender, System::EventArgs^ e) {
+	selectedClass = comboBox1->SelectedIndex;
+}
+private: System::Void Clear_Click(System::Object^ sender, System::EventArgs^ e) {
+	delete[] weights;
+	delete[] bias;
+	delete[] inputs;
+
+	weights = nullptr;
+	bias = nullptr;
+	inputs = nullptr;
+
+	addedInputCount = 0;
+	coordinate->Image = nullptr;
+	coordinate->Refresh();
+}
+private: System::Void saveInputs_Click(System::Object^ sender, System::EventArgs^ e) {
+	SaveFileDialog^ saveFileDialog = gcnew SaveFileDialog();
+
+	saveFileDialog->Filter = "Text Files (*.txt)|*.txt|All Files (*.*)|*.*";
+	saveFileDialog->Title = "Save inputs.";
+
+	if (saveFileDialog->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+	{
+		if (addedInputCount != 0) {
+			System::IO::StreamWriter^ writer = gcnew System::IO::StreamWriter(saveFileDialog->FileName);
+
+			for (int inputInd = 0; inputInd < addedInputCount; inputInd++)
+			{
+				writer->WriteLine(inputs[inputInd + 0 * addedInputCount] + " " + inputs[inputInd + 1 * addedInputCount] +
+					" " + inputs[inputInd + 2 * addedInputCount]);
+			}
+			writer->Close();
+		}
+	}
+}
+private: System::Void StartRegression_Click(System::Object^ sender, System::EventArgs^ e) {
+	
+	float minError = System::Convert::ToSingle(textBox2->Text);
+	float maxEpoch = System::Convert::ToSingle(textBox3->Text);
+	float lc = System::Convert::ToSingle(textBox4->Text);
+	std::cout << "Learninc C: " << lc << "\n";
+	std::cout << "maxEpoch: " << maxEpoch << "\n";
+	std::cout << "minError: " << minError << "\n";
+	Regression_Neuron neuron(dimension, addedInputCount, lc);
+	neuron.giveInputs(inputs);
+	neuron.initializeWeights();
+	
+
+	neuron.startRegression(maxEpoch,minError);
+
+	weights = neuron.returnWeights();
+	bias = neuron.returnBias();
+}
+private: System::Void loadInputs_Click(System::Object^ sender, System::EventArgs^ e) {
+	OpenFileDialog^ o = gcnew OpenFileDialog();
+	o->Filter = "Metin Dosyasý (*.txt)|*.txt";
+
+	if (o->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+		System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(o->FileName);
+
+		String^ line;
+		while ((line = sr->ReadLine()) != nullptr) {
+
+			// satýrý boþluklardan ayýr
+			array<String^>^ parts = line->Split(' ');
+
+			if (parts->Length == 3) {
+				float x = Int32::Parse(parts[0]);
+				float y = Int32::Parse(parts[1]);
+				int label = Int32::Parse(parts[2]);
+
+				inputs = addInput(inputs, x, y, label);
+				addedInputCount++;
+			}
+		}
+		sr->Close();
+
+
+		Bitmap^ surface = gcnew Bitmap(coordinate->Width, coordinate->Height);
+		Graphics^ g = Graphics::FromImage(surface);
+		// merkez
+		int cx = surface->Width / 2;
+		int cy = surface->Height / 2;
+		// eksen çiz
+		Pen^ axis = gcnew Pen(Color::Black, 2.0f);
+		g->DrawLine(axis, cx, 0, cx, surface->Height);
+		g->DrawLine(axis, 0, cy, surface->Width, cy);
+		//inputlari cizdiririz
+		for (int inputInd = 0; inputInd < addedInputCount; inputInd++)
+		{
+			int label = inputs[inputInd + dimension * addedInputCount];
+			Pen^ pen;
+			switch (label) { //ilgili label'e gore renk ayarlar.
+			case 0: pen = gcnew Pen(Color::Black, 3.0f); break;
+			case 1: pen = gcnew Pen(Color::Red, 3.0f); break;
+			case 2: pen = gcnew Pen(Color::Blue, 3.0f); break;
+			case 3: pen = gcnew Pen(Color::Green, 3.0f); break;
+			case 4: pen = gcnew Pen(Color::Yellow, 3.0f); break;
+			case 5: pen = gcnew Pen(Color::Orange, 3.0f); break;
+			default: pen = gcnew Pen(Color::YellowGreen, 3.0f);
+			}
+
+			int temp_x = inputs[inputInd + 0 * addedInputCount] + (coordinate->Width / 2);
+			int temp_y = -(inputs[inputInd + 1 * addedInputCount]) + coordinate->Height / 2;
+
+			g->DrawLine(pen, temp_x - 5, temp_y, temp_x + 5, temp_y);
+			g->DrawLine(pen, temp_x, temp_y - 5, temp_x, temp_y + 5);
+		}
+		coordinate->Image = surface;
+	}
+}
+};
+}
