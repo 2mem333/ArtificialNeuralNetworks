@@ -3,6 +3,8 @@
 #include "PerpectionLearning.h"
 #include "DeltaLearning.h"
 #include "SingleLayerNetwork.h"
+#include "MultiLayerNetwork.h"
+
 #include "Regression.h"
 #include <vector>
 
@@ -127,8 +129,8 @@ private: System::Windows::Forms::TabPage^ tabPage3;
 private: System::Windows::Forms::Label^ label28;
 private: System::Windows::Forms::TextBox^ textBox6;
 private: System::Windows::Forms::Button^ button2;
-private: System::Windows::Forms::TextBox^ textBox8;
-private: System::Windows::Forms::Label^ label30;
+
+
 private: System::Windows::Forms::TextBox^ textBox7;
 private: System::Windows::Forms::Label^ label29;
 
@@ -204,6 +206,12 @@ private: System::Windows::Forms::Label^ label29;
 			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->StartLearningSingleLayer = (gcnew System::Windows::Forms::Button());
 			this->TestSingleLayer = (gcnew System::Windows::Forms::Button());
+			this->tabPage3 = (gcnew System::Windows::Forms::TabPage());
+			this->button2 = (gcnew System::Windows::Forms::Button());
+			this->textBox7 = (gcnew System::Windows::Forms::TextBox());
+			this->label29 = (gcnew System::Windows::Forms::Label());
+			this->label28 = (gcnew System::Windows::Forms::Label());
+			this->textBox6 = (gcnew System::Windows::Forms::TextBox());
 			this->label6 = (gcnew System::Windows::Forms::Label());
 			this->textBox4 = (gcnew System::Windows::Forms::TextBox());
 			this->label5 = (gcnew System::Windows::Forms::Label());
@@ -226,22 +234,14 @@ private: System::Windows::Forms::Label^ label29;
 			this->totalcycle = (gcnew System::Windows::Forms::Label());
 			this->trainederror = (gcnew System::Windows::Forms::Label());
 			this->trainingtime = (gcnew System::Windows::Forms::Label());
-			this->tabPage3 = (gcnew System::Windows::Forms::TabPage());
-			this->label28 = (gcnew System::Windows::Forms::Label());
-			this->textBox6 = (gcnew System::Windows::Forms::TextBox());
-			this->label29 = (gcnew System::Windows::Forms::Label());
-			this->textBox7 = (gcnew System::Windows::Forms::TextBox());
-			this->textBox8 = (gcnew System::Windows::Forms::TextBox());
-			this->label30 = (gcnew System::Windows::Forms::Label());
-			this->button2 = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->coordinate))->BeginInit();
 			this->tabPage2->SuspendLayout();
 			this->tabPage1->SuspendLayout();
 			this->tabControl1->SuspendLayout();
 			this->tabPage5->SuspendLayout();
 			this->tabPage4->SuspendLayout();
-			this->panel1->SuspendLayout();
 			this->tabPage3->SuspendLayout();
+			this->panel1->SuspendLayout();
 			this->SuspendLayout();
 			// 
 			// coordinate
@@ -599,6 +599,69 @@ private: System::Windows::Forms::Label^ label29;
 			this->TestSingleLayer->UseVisualStyleBackColor = true;
 			this->TestSingleLayer->Click += gcnew System::EventHandler(this, &Main::TestSingleLayer_Click);
 			// 
+			// tabPage3
+			// 
+			this->tabPage3->Controls->Add(this->button2);
+			this->tabPage3->Controls->Add(this->textBox7);
+			this->tabPage3->Controls->Add(this->label29);
+			this->tabPage3->Controls->Add(this->label28);
+			this->tabPage3->Controls->Add(this->textBox6);
+			this->tabPage3->Location = System::Drawing::Point(4, 28);
+			this->tabPage3->Name = L"tabPage3";
+			this->tabPage3->Padding = System::Windows::Forms::Padding(3);
+			this->tabPage3->Size = System::Drawing::Size(578, 137);
+			this->tabPage3->TabIndex = 4;
+			this->tabPage3->Text = L"Multi Layer Network";
+			this->tabPage3->UseVisualStyleBackColor = true;
+			// 
+			// button2
+			// 
+			this->button2->Location = System::Drawing::Point(429, 6);
+			this->button2->Name = L"button2";
+			this->button2->Size = System::Drawing::Size(143, 39);
+			this->button2->TabIndex = 22;
+			this->button2->Text = L"Start Learning";
+			this->button2->UseVisualStyleBackColor = true;
+			this->button2->Click += gcnew System::EventHandler(this, &Main::button2_Click);
+			// 
+			// textBox7
+			// 
+			this->textBox7->Location = System::Drawing::Point(142, 41);
+			this->textBox7->Name = L"textBox7";
+			this->textBox7->Size = System::Drawing::Size(102, 24);
+			this->textBox7->TabIndex = 19;
+			this->textBox7->Text = L"5,2";
+			// 
+			// label29
+			// 
+			this->label29->AutoSize = true;
+			this->label29->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label29->Location = System::Drawing::Point(6, 43);
+			this->label29->Name = L"label29";
+			this->label29->Size = System::Drawing::Size(122, 20);
+			this->label29->TabIndex = 18;
+			this->label29->Text = L"Neuron Counts:";
+			// 
+			// label28
+			// 
+			this->label28->AutoSize = true;
+			this->label28->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label28->Location = System::Drawing::Point(6, 14);
+			this->label28->Name = L"label28";
+			this->label28->Size = System::Drawing::Size(108, 20);
+			this->label28->TabIndex = 17;
+			this->label28->Text = L"Layer Counts:";
+			// 
+			// textBox6
+			// 
+			this->textBox6->Location = System::Drawing::Point(142, 10);
+			this->textBox6->Name = L"textBox6";
+			this->textBox6->Size = System::Drawing::Size(102, 24);
+			this->textBox6->TabIndex = 16;
+			this->textBox6->Text = L"2";
+			// 
 			// label6
 			// 
 			this->label6->AutoSize = true;
@@ -832,89 +895,6 @@ private: System::Windows::Forms::Label^ label29;
 			this->trainingtime->TabIndex = 25;
 			this->trainingtime->Text = L"0";
 			// 
-			// tabPage3
-			// 
-			this->tabPage3->Controls->Add(this->button2);
-			this->tabPage3->Controls->Add(this->textBox8);
-			this->tabPage3->Controls->Add(this->label30);
-			this->tabPage3->Controls->Add(this->textBox7);
-			this->tabPage3->Controls->Add(this->label29);
-			this->tabPage3->Controls->Add(this->label28);
-			this->tabPage3->Controls->Add(this->textBox6);
-			this->tabPage3->Location = System::Drawing::Point(4, 28);
-			this->tabPage3->Name = L"tabPage3";
-			this->tabPage3->Padding = System::Windows::Forms::Padding(3);
-			this->tabPage3->Size = System::Drawing::Size(578, 137);
-			this->tabPage3->TabIndex = 4;
-			this->tabPage3->Text = L"Multi Layer Network";
-			this->tabPage3->UseVisualStyleBackColor = true;
-			// 
-			// label28
-			// 
-			this->label28->AutoSize = true;
-			this->label28->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label28->Location = System::Drawing::Point(6, 14);
-			this->label28->Name = L"label28";
-			this->label28->Size = System::Drawing::Size(158, 20);
-			this->label28->TabIndex = 17;
-			this->label28->Text = L"Hidden Layer Count:";
-			// 
-			// textBox6
-			// 
-			this->textBox6->Location = System::Drawing::Point(180, 10);
-			this->textBox6->Name = L"textBox6";
-			this->textBox6->Size = System::Drawing::Size(69, 24);
-			this->textBox6->TabIndex = 16;
-			this->textBox6->Text = L"1";
-			// 
-			// label29
-			// 
-			this->label29->AutoSize = true;
-			this->label29->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label29->Location = System::Drawing::Point(6, 43);
-			this->label29->Name = L"label29";
-			this->label29->Size = System::Drawing::Size(168, 20);
-			this->label29->TabIndex = 18;
-			this->label29->Text = L"Neuron Counts (a,b..):";
-			// 
-			// textBox7
-			// 
-			this->textBox7->Location = System::Drawing::Point(180, 43);
-			this->textBox7->Name = L"textBox7";
-			this->textBox7->Size = System::Drawing::Size(69, 24);
-			this->textBox7->TabIndex = 19;
-			this->textBox7->Text = L"30";
-			// 
-			// textBox8
-			// 
-			this->textBox8->Location = System::Drawing::Point(180, 92);
-			this->textBox8->Name = L"textBox8";
-			this->textBox8->Size = System::Drawing::Size(69, 24);
-			this->textBox8->TabIndex = 21;
-			this->textBox8->Text = L"10";
-			// 
-			// label30
-			// 
-			this->label30->AutoSize = true;
-			this->label30->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label30->Location = System::Drawing::Point(6, 96);
-			this->label30->Name = L"label30";
-			this->label30->Size = System::Drawing::Size(171, 20);
-			this->label30->TabIndex = 20;
-			this->label30->Text = L"Output Neuron Count:";
-			// 
-			// button2
-			// 
-			this->button2->Location = System::Drawing::Point(429, 6);
-			this->button2->Name = L"button2";
-			this->button2->Size = System::Drawing::Size(143, 39);
-			this->button2->TabIndex = 22;
-			this->button2->Text = L"Start Learning";
-			this->button2->UseVisualStyleBackColor = true;
-			// 
 			// Main
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
@@ -948,10 +928,10 @@ private: System::Windows::Forms::Label^ label29;
 			this->tabPage5->PerformLayout();
 			this->tabPage4->ResumeLayout(false);
 			this->tabPage4->PerformLayout();
-			this->panel1->ResumeLayout(false);
-			this->panel1->PerformLayout();
 			this->tabPage3->ResumeLayout(false);
 			this->tabPage3->PerformLayout();
+			this->panel1->ResumeLayout(false);
+			this->panel1->PerformLayout();
 			this->ResumeLayout(false);
 			this->PerformLayout();
 
@@ -988,6 +968,16 @@ private: System::Windows::Forms::Label^ label29;
 
 			delete[] inputs;
 			return temp;
+		}
+
+		int *createLayer(int layerC)
+		{
+			int* layers = new int[layerC];
+			return layers;
+		}
+		void addLayer(int* layer, int neuronCount,int ind)
+		{
+			layer[ind] = neuronCount;
 		}
 
 
@@ -1420,5 +1410,42 @@ private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e
 	testResults_Click(button1, nullptr);
 }
 
+private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
+
+
+	int layerCount = System::Convert::ToInt32(textBox6->Text);
+	int* layers = createLayer(layerCount);
+
+	array<String^>^ parts = textBox7->Text->Split(',');
+
+	if (parts->Length == layerCount) {
+		for (int i = 0; i < layerCount; i++)
+		{
+			layers[i] = Int32::Parse(parts[i]);
+		}
+	}
+	else
+		return;
+
+	float minError = System::Convert::ToSingle(textBox2->Text);
+	float maxEpoch = System::Convert::ToSingle(textBox3->Text);
+	float lc = System::Convert::ToSingle(textBox4->Text);
+	std::cout << "Learninc C: " << lc << "\n";
+	std::cout << "maxEpoch: " << maxEpoch << "\n";
+	std::cout << "minError: " << minError << "\n";
+
+	MultiLayerNetwork network(layerCount, layers, 2, addedInputCount);
+	network.giveInputs(inputs);
+	network.printInputs();
+	network.showStatus();
+	network.initializeBias();
+	network.initializeWeights();
+
+	info inf = network.StartLearning(minError, maxEpoch, lc);
+	trainederror->Text = inf.error.ToString();;
+	totalcycle->Text = inf.cycle.ToString();;
+
+
+}
 };
 }

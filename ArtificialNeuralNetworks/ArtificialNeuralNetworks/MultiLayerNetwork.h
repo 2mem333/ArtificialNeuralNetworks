@@ -1,9 +1,6 @@
 #pragma once
 #include <iostream>
-#include <math.h>
-#include <fstream>
-#include <string>
-#include <sstream>
+#include "dataStruct.h"
 
 
 //#define DEBUG
@@ -22,7 +19,7 @@ public:
 	int layerCount; //SHOWS HOW MANY H.LAYER THERE WILL BE
 	int* LayerNeuronCounts; // ALSO HOW MUCH NEURON WILL BE USED FOR EACH LAYER.
 
-	int *LayerSizes;
+	int* LayerSizes;
 	int* LayerStartsInd; //neurons dizisi icinde her bir layerin start indeksi
 	int* LayerBStartInd;
 
@@ -41,7 +38,7 @@ public:
 	float* std;
 
 	//BOYUT, GIRIS SAYISI, ARA KATMAN NORON SAYISI, CIKIS NORON SAYISI
-	MultiLayerNetwork(int hlCount, int* hNCounts,int dim, int ic)
+	MultiLayerNetwork(int hlCount, int* hNCounts, int dim, int ic)
 	{
 		layerCount = hlCount;
 		LayerNeuronCounts = hNCounts;
@@ -78,7 +75,7 @@ public:
 		std = new float[dim];
 	}
 
-	
+
 	void showStatus()
 	{
 		std::cout << "Hidden layer count: " << layerCount << "\n";
@@ -87,7 +84,7 @@ public:
 
 		for (int layer = 0; layer < layerCount; layer++)
 		{
-			std::cout << "Layer " << layer << ": " << LayerStartsInd[layer] << "   " << 
+			std::cout << "Layer " << layer << ": " << LayerStartsInd[layer] << "   " <<
 				LayerSizes[layer] + LayerStartsInd[layer] - 1 << "\n";
 			std::cout << "Neuron Count: " << LayerNeuronCounts[layer] << "\n";
 			std::cout << "Bias start ind: " << LayerBStartInd[layer] << "\n\n";
@@ -95,8 +92,8 @@ public:
 
 	}
 
-	//AÄžIRLIKLARIN DEÄžERLERÄ° RANDOM BAÅžLATILMALI
-	//EÄžER HEPSÄ° AYNI KALIRSA, AYNI INPUT,TUREV,GRADYANT YUZUNDEN NORONLARIN AGIRLIKLARI HEP AYNI OLUR
+	//AÐIRLIKLARIN DEÐERLERÝ RANDOM BAÞLATILMALI
+	//EÐER HEPSÝ AYNI KALIRSA, AYNI INPUT,TUREV,GRADYANT YUZUNDEN NORONLARIN AGIRLIKLARI HEP AYNI OLUR
 	void initializeWeights()
 	{
 		for (int i = 0; i < totalHnSize; i++)
@@ -112,36 +109,6 @@ public:
 		}
 	}
 
-
-	void readInputs(std::ifstream& file)
-	{
-		float* input = new float[dimension + 1]; //last one is for label.
-		std::string line;
-
-		while (std::getline(file, line)) {
-			std::stringstream ss(line);
-
-			for (int d = 0; d < dimension + 1; d++)
-			{
-				ss >> input[d];
-			}
-
-			addInput(input);
-		}
-		delete[] input;
-
-	}
-	void addInput(float* inp)
-	{
-		if (addedInputCount == inputCount)
-			return;
-
-		for (int i = 0; i < dimension + 1; i++)
-		{
-			inputs[i * inputCount + addedInputCount] = inp[i];
-		}
-		addedInputCount++;
-	}
 
 	void giveInputs(float* inp)
 	{
@@ -185,7 +152,7 @@ public:
 				std[i] += diff * diff;
 			}
 			std[i] = sqrt(std[i] / inputCount);
-			if (std[i] < 0.0001f) std[i] = 1.0f; // SÄ±fÄ±r bÃ¶lme hatasÄ±nÄ± Ã¶nle
+			if (std[i] < 0.0001f) std[i] = 1.0f; // Sýfýr bölme hatasýný önle
 		}
 
 		//APPLY NORMALIZATION
@@ -204,11 +171,11 @@ public:
 			array[i] = 0;
 	}
 
-	
-	int StartLearning(float minErr, float maxEpoch,float lc)
+
+	info StartLearning(float minErr, float maxEpoch, float lc)
 	{
 		if (layerCount < 2)
-			return -1;
+			return info{-1,-1};
 
 		float* normalizedSamples = normalizeInputs();
 
@@ -221,8 +188,7 @@ public:
 		float* errors = new float[totalBiasSize];
 
 		int cycle = 0;
-
-		while(cycle < 10000 && cycle < maxEpoch)
+		while (cycle < 10000 && cycle < maxEpoch &&!isFinished)
 		{
 			totalErr = 0;
 			for (int inputInd = 0; inputInd < inputCount; inputInd++)
@@ -255,7 +221,7 @@ public:
 						for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
 							net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
 							*
-							Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baÅŸlangÄ±Ã§ offset
+							Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baþlangýç offset
 
 						net[indeks] += bias[indeks];
 						fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
@@ -269,6 +235,7 @@ public:
 				{
 					int ind = ni + LayerBStartInd[outLayer];
 
+					//outputtaki cikis noronlari targetleri vermeli. 2 class varsa 2 output noronu olcak
 					float desired = -1;
 					if (inputs[inputInd + dimension * inputCount] == ni) //ERROR FIX
 						desired = 1;
@@ -350,13 +317,12 @@ public:
 			}
 
 			if (totalErr / inputCount < minErr)
-				return cycle;
-			else 
+				isFinished = true;
+			else
 			{
-				std::cout << totalErr / inputCount << "\n";
 				cycle++;
 			}
 		}
-			return cycle;
+		return info{ totalErr / inputCount , cycle };
 	}
 };
