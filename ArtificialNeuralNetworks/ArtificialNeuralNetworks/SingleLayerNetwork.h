@@ -2,6 +2,7 @@
 #include <iostream>
 #include <math.h>
 #include <fstream>
+#include "dataStruct.h"
 
 //#define DEBUG
 #ifdef DEBUG
@@ -11,6 +12,7 @@
 #endif
 
 #define euler 2.718281828459045
+
 
 
 class SingleLayerNetwork {
@@ -122,7 +124,7 @@ public:
 		return normalized;
 	}
 
-	int StartLearning(float minError, float maxEpoch)
+	info StartLearning(float minError, float maxEpoch)
 	{
 
 		float* norm_Samples = normalizeInputs();
@@ -138,10 +140,11 @@ public:
 		bool isFinished = false;
 
 		int cycleCount = 0;
+		float total_err;
 
 		while (!isFinished) {
 			cycleCount++;
-			float total_err = 0;
+			total_err = 0;
 			for (int inputInd = 0; inputInd < inputCount; inputInd++)
 			{
 				//feedforward
@@ -182,12 +185,10 @@ public:
 
 			if (total_err <= minError || cycleCount > maxEpoch)
 				isFinished = true;
-			//else
-				//std::cout << total_err << "\n";
 
 		}
 
-		return cycleCount;
+		return info{ total_err / float(classCount * inputCount), cycleCount, };
 	}
 
 
@@ -211,9 +212,10 @@ public:
 	{
 		float *orgBias = new float[classCount];
 		for (int neuronInd = 0; neuronInd < classCount; neuronInd++) {
-			for (int d = 0; d < dimension; d++)
+			orgBias[neuronInd] = bias[neuronInd];
+			for (int d = 0; d < dimension; d++) //[HATA_FIX] normalde inputlarda kayma olabiliyordu nedeni buradaki bias denormalize hatasindanmis.
 			{
-				orgBias[neuronInd] = bias[neuronInd] - weights[neuronInd + classCount * d] * mean[d] / std[d];
+				orgBias[neuronInd] -= weights[neuronInd + classCount * d] * mean[d] / std[d];
 			}
 		}
 		return orgBias;
