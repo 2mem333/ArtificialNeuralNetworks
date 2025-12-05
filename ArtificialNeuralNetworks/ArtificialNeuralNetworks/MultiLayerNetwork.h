@@ -15,7 +15,6 @@
 
 #define euler 2.718281828459045
 
-float lc = 0.01; //global var.
 
 class MultiLayerNetwork {
 public:
@@ -206,23 +205,29 @@ public:
 	}
 
 	
-	int StartLearning(float minErr, float maxEpoch)
+	int StartLearning(float minErr, float maxEpoch,float lc)
 	{
+		if (layerCount < 2)
+			return -1;
+
 		float* normalizedSamples = normalizeInputs();
 
-		int cycle = 0;
 		bool isFinished = false;
 		float totalErr = 0;
 
 		float* net = new float[totalBiasSize];
 		float* fnet = new float[totalBiasSize];
 		float* fnetDer = new float[totalBiasSize];
-		float* errors = new float[LayerNeuronCounts[layerCount-1]];
+		float* errors = new float[totalBiasSize];
 
+		int cycle = 0;
+
+		while(cycle < 10000 && cycle < maxEpoch)
+		{
 			totalErr = 0;
 			for (int inputInd = 0; inputInd < inputCount; inputInd++)
 			{
-				
+
 				//FIRST LAYER FF
 				for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
 				{
@@ -247,10 +252,10 @@ public:
 						int indeks = ni + LayerBStartInd[layer];
 
 						net[indeks] = 0;
-						for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++)
-							net[indeks] += Neurons[d + LayerStartsInd[layer - 1]] //onceki layerdan ciktilar
+						for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
+							net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
 							*
-							Neurons[ni + LayerNeuronCounts[layer - 1] * d + LayerStartsInd[layer]];//ni + dim*d + başlangıç offset
+							Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + başlangıç offset
 
 						net[indeks] += bias[indeks];
 						fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
@@ -260,19 +265,98 @@ public:
 
 				////CALCULATE ERROR
 				int outLayer = layerCount - 1; //select the output layer
-				for (int ni = 0; ni < LayerNeuronCounts[outLayer];ni++)
+				for (int ni = 0; ni < LayerNeuronCounts[outLayer]; ni++)
 				{
+					int ind = ni + LayerBStartInd[outLayer];
+
 					float desired = -1;
-					if (inputs[inputInd + dimension * inputCount] == outLayer)
+					if (inputs[inputInd + dimension * inputCount] == ni) //ERROR FIX
 						desired = 1;
 
-					errors[ni] = desired - fnet[ni + LayerBStartInd[outLayer]];
-					totalErr += errors[ni] * errors[ni] * 0.5f;
+					errors[ind] = desired - fnet[ind];
+					totalErr += errors[ind] * errors[ind] * 0.5f;
 				}
 
-				
+
+				//CALCULATE ERROR FOR REMAINING LAYERS
+				for (int layer = layerCount - 2; layer > -1; layer--)
+				{
+					for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
+					{
+						int ind = ni + LayerBStartInd[layer];
+						errors[ind] = 0;
+
+						for (int nn = 0; nn < LayerNeuronCounts[layer + 1]; nn++) //next neuron
+						{
+							errors[ind] += errors[nn + LayerBStartInd[layer + 1]] *
+								fnetDer[nn + LayerBStartInd[layer + 1]] *
+								Neurons[nn + LayerNeuronCounts[layer + 1] * ni + LayerStartsInd[layer + 1]];
+						}
+
+					}
+				}
+
+
+				//OUTPUT LAYER FB
+				for (int ni = 0; ni < LayerNeuronCounts[outLayer]; ni++)
+				{
+					int ind = ni + LayerBStartInd[outLayer];
+
+					for (int pn = 0; pn < LayerNeuronCounts[outLayer - 1]; pn++) //previous neuron indekses
+					{
+						Neurons[ni + pn * LayerNeuronCounts[outLayer] + LayerStartsInd[outLayer]] +=
+							lc *
+							errors[ind] *
+							fnet[pn + LayerBStartInd[outLayer - 1]] *  //previous neuron's activation
+							fnetDer[ind];
+					}
+					bias[ind] += lc * errors[ind] * fnetDer[ind];
+				}
+
+				//REMANINING LAYERS FB
+				for (int layer = layerCount - 2; layer != 0; layer--)
+				{
+					for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
+					{
+						int ind = ni + LayerBStartInd[layer];
+
+						for (int pn = 0; pn < LayerNeuronCounts[layer - 1]; pn++) //previous neuron indekses
+						{
+							Neurons[ni + pn * LayerNeuronCounts[layer] + LayerStartsInd[layer]] +=
+								lc *
+								errors[ind] *
+								fnet[pn + LayerBStartInd[layer - 1]] *  //previous neuron's activation
+								fnetDer[ind];
+						}
+						bias[ind] += lc * errors[ind] * fnetDer[ind];
+					}
+				}
+
+				//FIRST LAYER FB
+				for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
+				{
+					int ind = ni + LayerBStartInd[0];
+					for (int d = 0; d < dimension; d++)
+					{
+						Neurons[ni + LayerNeuronCounts[0] * d] +=
+							lc *
+							normalizedSamples[inputInd + inputCount * d] *
+							fnetDer[ind] *
+							errors[ind];
+					}
+					bias[ind] += lc * errors[ind] * fnetDer[ind];
+				}
+
 			}
-			std::cout << totalErr << " ERROR\n";
-			return 0;
+
+			if (totalErr / inputCount < minErr)
+				return cycle;
+			else 
+			{
+				std::cout << totalErr / inputCount << "\n";
+				cycle++;
+			}
+		}
+			return cycle;
 	}
 };
