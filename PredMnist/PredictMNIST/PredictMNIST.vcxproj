@@ -124,6 +124,7 @@
     <ClInclude Include="Main.h">
       <FileType>CppForm</FileType>
     </ClInclude>
+    <ClInclude Include="MultiLayerNetwork.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Main.resx">

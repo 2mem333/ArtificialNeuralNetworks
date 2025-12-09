@@ -26,12 +26,23 @@ namespace PredictMNIST {
 		}
 	private:
 		/// UDV User Defined Variables
-		float* input = new float[28*28];
-		float* HiddenNeurons;
-		float* hbias;
 
-		float* OutputNeurons;
-		float* obias;
+		int *LayerNeuronCounts;
+		int layerCount;
+
+		float* input = new float[28*28];
+
+		float* Neurons;
+		float* bias;
+
+		int* LayerSizes;
+		int* LayerStartsInd; //neurons dizisi icinde her bir layerin start indeksi
+		int* LayerBStartInd;
+
+		float totalHnSize;
+		float totalBiasSize;
+
+		int dimension = 784;
 
 		float* mean;
 		float* std;
@@ -39,8 +50,6 @@ namespace PredictMNIST {
 
 		bool weightsLoaded = false;
 
-		int oCount = 10;
-		int hCount = 64;
 
 	private: System::Windows::Forms::RichTextBox^ richTextBox1;
 	private: System::Windows::Forms::Button^ button1;
@@ -60,8 +69,13 @@ namespace PredictMNIST {
 	private: System::Windows::Forms::Label^ label19;
 	private: System::Windows::Forms::Label^ label18;
 	private: System::Windows::Forms::Label^ label17;
-	private: System::Windows::Forms::Label^ label16;
-	private: System::Windows::Forms::Label^ label13;
+
+
+
+
+
+
+
 
 
 	private: System::Windows::Forms::Button^ Predict;
@@ -170,8 +184,6 @@ namespace PredictMNIST {
 			this->label19 = (gcnew System::Windows::Forms::Label());
 			this->label18 = (gcnew System::Windows::Forms::Label());
 			this->label17 = (gcnew System::Windows::Forms::Label());
-			this->label16 = (gcnew System::Windows::Forms::Label());
-			this->label13 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->panel1->SuspendLayout();
 			this->panel2->SuspendLayout();
@@ -661,8 +673,6 @@ namespace PredictMNIST {
 			this->panel5->Controls->Add(this->label19);
 			this->panel5->Controls->Add(this->label18);
 			this->panel5->Controls->Add(this->label17);
-			this->panel5->Controls->Add(this->label16);
-			this->panel5->Controls->Add(this->label13);
 			this->panel5->Controls->Add(this->label14);
 			this->panel5->Controls->Add(this->label15);
 			this->panel5->Location = System::Drawing::Point(308, 33);
@@ -676,11 +686,11 @@ namespace PredictMNIST {
 			this->label19->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->label19->ForeColor = System::Drawing::Color::White;
-			this->label19->Location = System::Drawing::Point(3, 131);
+			this->label19->Location = System::Drawing::Point(3, 114);
 			this->label19->Name = L"label19";
-			this->label19->Size = System::Drawing::Size(142, 19);
+			this->label19->Size = System::Drawing::Size(81, 19);
 			this->label19->TabIndex = 42;
-			this->label19->Text = L"Output Neurons: 10";
+			this->label19->Text = L"Neurons: {}";
 			// 
 			// label18
 			// 
@@ -688,11 +698,11 @@ namespace PredictMNIST {
 			this->label18->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->label18->ForeColor = System::Drawing::Color::White;
-			this->label18->Location = System::Drawing::Point(3, 112);
+			this->label18->Location = System::Drawing::Point(3, 84);
 			this->label18->Name = L"label18";
-			this->label18->Size = System::Drawing::Size(143, 19);
+			this->label18->Size = System::Drawing::Size(109, 19);
 			this->label18->TabIndex = 41;
-			this->label18->Text = L"Hidden Neurons: 64";
+			this->label18->Text = L"Layer Count: 0";
 			// 
 			// label17
 			// 
@@ -705,37 +715,13 @@ namespace PredictMNIST {
 			this->label17->Size = System::Drawing::Size(0, 19);
 			this->label17->TabIndex = 40;
 			// 
-			// label16
-			// 
-			this->label16->AutoSize = true;
-			this->label16->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label16->ForeColor = System::Drawing::Color::White;
-			this->label16->Location = System::Drawing::Point(3, 74);
-			this->label16->Name = L"label16";
-			this->label16->Size = System::Drawing::Size(151, 19);
-			this->label16->TabIndex = 39;
-			this->label16->Text = L"Used Samples: 10000";
-			// 
-			// label13
-			// 
-			this->label13->AutoSize = true;
-			this->label13->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label13->ForeColor = System::Drawing::Color::White;
-			this->label13->Location = System::Drawing::Point(3, 55);
-			this->label13->Name = L"label13";
-			this->label13->Size = System::Drawing::Size(115, 19);
-			this->label13->TabIndex = 38;
-			this->label13->Text = L"Trained Err: 0.01";
-			// 
 			// Main
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Dpi;
 			this->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(30)), static_cast<System::Int32>(static_cast<System::Byte>(30)),
 				static_cast<System::Int32>(static_cast<System::Byte>(30)));
-			this->ClientSize = System::Drawing::Size(1146, 461);
+			this->ClientSize = System::Drawing::Size(1146, 487);
 			this->Controls->Add(this->panel5);
 			this->Controls->Add(this->panel4);
 			this->Controls->Add(this->panel3);
@@ -767,25 +753,21 @@ namespace PredictMNIST {
 
 	private: System::Void loadWeights_Click(System::Object^ sender, System::EventArgs^ e) {
 
-		if (HiddenNeurons) { delete[] HiddenNeurons; HiddenNeurons = nullptr; }
-		if (hbias) { delete[] hbias; hbias = nullptr; }
+		if (weightsLoaded)
+		{
+			delete[] mean; mean = nullptr;
+			delete[] std; std = nullptr;
+			delete[] LayerSizes; LayerSizes = nullptr;
+			delete[] LayerStartsInd; LayerStartsInd = nullptr;
+			delete[] LayerBStartInd; LayerBStartInd = nullptr;
+			delete[]LayerNeuronCounts; LayerNeuronCounts = nullptr;
 
-		if (OutputNeurons) { delete[] OutputNeurons; OutputNeurons = nullptr; }
-		if (obias) { delete[] obias; obias = nullptr; }
+			delete[] Neurons; Neurons = nullptr;
+			delete[] bias; bias = nullptr;
 
-		if (mean) { delete[] mean; mean = nullptr; }
-		if (std) { delete[] std; std = nullptr; }
+		}
 
-		HiddenNeurons = new float[784 * hCount];
-		hbias = new float[hCount];
 
-		OutputNeurons = new float[hCount * oCount];
-		obias = new float[oCount];
-
-		mean = new float[784];
-		std = new float[784];
-
-		
 		OpenFileDialog^ o = gcnew OpenFileDialog();
 		o->Filter = "Metin Dosyasý (*.txt)|*.txt";
 
@@ -793,44 +775,99 @@ namespace PredictMNIST {
 			System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(o->FileName);
 
 			String^ line;
+			line = sr->ReadLine();
+			layerCount = System::Convert::ToInt32(line);
+			LayerNeuronCounts = new int[layerCount];
 
-			for (int d = 0; d < 784; d++) //read mean and std
+			for(int i = 0; i < layerCount; i++)
 			{
 				line = sr->ReadLine();
-				mean[d] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				line = sr->ReadLine();
-				std[d] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-			}
+				LayerNeuronCounts[i] = System::Convert::ToInt32(line);
+			} 
 
-			for (int hNeuronIndeks = 0; hNeuronIndeks < hCount; hNeuronIndeks++)
+
+		LayerSizes = new int[layerCount];
+		LayerStartsInd = new int[layerCount];
+		LayerBStartInd = new int[layerCount];
+
+		LayerSizes[0] = dimension * LayerNeuronCounts[0];
+		totalHnSize = LayerSizes[0];
+		totalBiasSize = LayerNeuronCounts[0];
+		LayerStartsInd[0] = 0;
+		LayerBStartInd[0] = 0;
+
+
+		for (int layer = 1; layer < layerCount; layer++)
+		{
+			LayerSizes[layer] = LayerNeuronCounts[layer - 1] * LayerNeuronCounts[layer];
+
+			LayerStartsInd[layer] = totalHnSize;
+			totalHnSize += LayerSizes[layer];
+
+			LayerBStartInd[layer] = totalBiasSize;
+			totalBiasSize += LayerNeuronCounts[layer];
+
+		}
+
+		Neurons = new float[totalHnSize];
+		bias = new float[totalBiasSize];
+
+		mean = new float[784];
+		std = new float[784];
+
+	
+
+			float value;
+			for (int d = 0; d < dimension; d++)
 			{
-				for (int satir = 0; satir < 784; satir++)
-				{
-					line = sr->ReadLine();
-					HiddenNeurons[hNeuronIndeks + satir * hCount] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				}
 				line = sr->ReadLine();
-				hbias[hNeuronIndeks] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-
-				line = sr->ReadLine(); //bos satiri oku.
+				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+				mean[d] = value;
+				line = sr->ReadLine();
+				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+				std[d] = value;
+			}
+			line = sr->ReadLine(); //SKIP END
+			if (line == "END") {
+				std::cout << "Mean std readed.\n";
 			}
 
-			for (int oNeuronIndeks = 0; oNeuronIndeks < oCount; oNeuronIndeks++)
+			for (int i = 0; i < totalHnSize; i++)
 			{
-				for (int satir = 0; satir < hCount; satir++)
-				{
-					line = sr->ReadLine();
-					OutputNeurons[oNeuronIndeks + satir * oCount] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				}
 				line = sr->ReadLine();
-				obias[oNeuronIndeks] = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				line = sr->ReadLine(); //bos satiri oku.
+				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+				Neurons[i] = value;
 			}
+			line = sr->ReadLine(); //SKIP END
+			if (line == "END") {
+				std::cout << "Weights readed.\n";
+			}
+
+			for (int i = 0; i < totalBiasSize; i++)
+			{
+				line = sr->ReadLine();
+				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+				bias[i] = value;
+			}
+
+			line = sr->ReadLine(); //SKIP END
+			if (line == "END") {
+				std::cout << "Bias readed.\n";
+			}
+
 			sr->Close();
 
 			label15->Text = "True";
 			label15->ForeColor = Color::Green;
 			weightsLoaded = true;
+
+			label18->Text = "Layer Count: " + layerCount.ToString();;
+			label19->Text = "Neurons: ";
+
+			for (int i = 0; i < layerCount; i++)
+			{
+				label19->Text += "{" + LayerNeuronCounts[i] + "} ";
+			}
 
 			std::cout << "Done reading weights!\n";
 
@@ -876,51 +913,61 @@ private: System::Void Predict_Click(System::Object^ sender, System::EventArgs^ e
 	if (!weightsLoaded)
 		return;
 
-	float* Hnet = new float[hCount];
-	float* Hfnet = new float[hCount];
-
-	float* Onet = new float[oCount];
-	float* Ofnet = new float[oCount];
-
 	if (isNormalized)
 	{
 		for (int d = 0; d < 784; d++) //normalize input
 			input[d] = (input[d] - mean[d]) / std[d];
 		isNormalized = true;
 	}
-	for (int hNeuronIndeks = 0; hNeuronIndeks < hCount; hNeuronIndeks++)
+
+	float* net = new float[totalBiasSize];
+	float* fnet = new float[totalBiasSize];
+
+	//FIRST LAYER FF
+	for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
 	{
-		Hnet[hNeuronIndeks] = 0.0f;
+		int indeks = ni + LayerBStartInd[0]; //ilk layerin bias indeksi
 
-		for (int d = 0; d < 784; d++)
-			Hnet[hNeuronIndeks] += HiddenNeurons[hNeuronIndeks + d * hCount] * input[d];
+		net[indeks] = 0;
+		for (int d = 0; d < dimension; d++)
+			net[indeks] += input[d] * Neurons[ni + LayerNeuronCounts[0] * d];
 
-		Hnet[hNeuronIndeks] += hbias[hNeuronIndeks];
-		Hfnet[hNeuronIndeks] = (2.0f / (1.0f + exp(-Hnet[hNeuronIndeks]))) - 1.0f;
+		net[indeks] += bias[indeks];
+
+		fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
 	}
 
-	for (int OneuronIndeks = 0; OneuronIndeks < oCount; OneuronIndeks++)
+	//NEXT LAYERS FF
+	for (int layer = 1; layer < layerCount; layer++)
 	{
-		Onet[OneuronIndeks] = 0.0f;
+		for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
+		{
+			int indeks = ni + LayerBStartInd[layer];
 
-		for (int h = 0; h < hCount; h++)
-			Onet[OneuronIndeks] += OutputNeurons[OneuronIndeks + h * oCount] * Hfnet[h];
+			net[indeks] = 0;
+			for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
+				net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
+				*
+				Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baþlangýç offset
 
-		Onet[OneuronIndeks] += obias[OneuronIndeks];
-		Ofnet[OneuronIndeks] = (2.0f / (1.0f + exp(-Onet[OneuronIndeks]))) - 1.0f;
+			net[indeks] += bias[indeks];
+			fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
+		}
 	}
-	
-	std::cout << "Predicting"<< "\n";
-	for (int i = 0; i < oCount; i++)
-	{
-		float accuarity = (1 + Ofnet[i]) / 2 * 100;
+
+	int outputLayer = layerCount - 1;
+
+	for (int o = 0; o < LayerNeuronCounts[outputLayer]; o++) {
+		int indeks = o + LayerBStartInd[outputLayer];
+
+		float accuarity = (1 + fnet[indeks]) / 2 * 100;
 		int shade = 128 + (int)(accuarity / 100.0f * 127);
 		System::Drawing::Color col =
 			System::Drawing::Color::FromArgb(shade, shade, shade);
 
 
-		std::cout << "Number: " << i << " : " << accuarity << "\n";
-		switch (i)
+		std::cout << "Number: " << o << " : " << accuarity << "\n";
+		switch (o)
 		{
 		case 0:
 			value0->Text = "%" + System::Convert::ToString(accuarity);
@@ -965,6 +1012,7 @@ private: System::Void Predict_Click(System::Object^ sender, System::EventArgs^ e
 		}
 	}
 	std::cout << "\n";
+
 }
 private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
 	if (input) { delete[] input; input = nullptr; }
