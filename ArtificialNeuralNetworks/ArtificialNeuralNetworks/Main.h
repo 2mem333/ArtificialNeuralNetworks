@@ -630,7 +630,7 @@ private: System::Windows::Forms::Label^ label29;
 			this->textBox7->Name = L"textBox7";
 			this->textBox7->Size = System::Drawing::Size(102, 24);
 			this->textBox7->TabIndex = 19;
-			this->textBox7->Text = L"5,2";
+			this->textBox7->Text = L"5,5";
 			// 
 			// label29
 			// 
@@ -1445,7 +1445,63 @@ private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e
 	trainederror->Text = inf.error.ToString();;
 	totalcycle->Text = inf.cycle.ToString();;
 
+	//DRAWING STARTS
+	Bitmap^ surface = gcnew Bitmap(coordinate->Width, coordinate->Height);
+	Graphics^ g = Graphics::FromImage(surface);
 
+	//inputlari cizdiririz
+	for (int inputInd = 0; inputInd < addedInputCount; inputInd++)
+	{
+		int label = inputs[inputInd + dimension * addedInputCount];
+
+		Pen^ pen;
+		switch (label) { //ilgili label'e gore renk ayarlar.
+		case 0: pen = gcnew Pen(Color::Black, 3.0f); break;
+		case 1: pen = gcnew Pen(Color::Red, 3.0f); break;
+		case 2: pen = gcnew Pen(Color::Blue, 3.0f); break;
+		case 3: pen = gcnew Pen(Color::Green, 3.0f); break;
+		case 4: pen = gcnew Pen(Color::Yellow, 3.0f); break;
+		case 5: pen = gcnew Pen(Color::Orange, 3.0f); break;
+		default: pen = gcnew Pen(Color::YellowGreen, 3.0f);
+		}
+
+
+		float temp_x = inputs[inputInd + 0 * addedInputCount] + (coordinate->Width / 2);
+		float temp_y = -(inputs[inputInd + 1 * addedInputCount]) + coordinate->Height / 2;
+
+
+		g->DrawLine(pen, temp_x - 5, temp_y, temp_x + 5, temp_y);
+		g->DrawLine(pen, temp_x, temp_y - 5, temp_x, temp_y + 5);
+	}
+
+	//DRAW DESICION BOUNDRY
+	for (int y = -227; y < 228; y = y + 20) {
+		for (int x = -coordinate->Width / 2 + 5; x < coordinate->Width / 2 - 5; x = x + 20)
+		{
+
+			float input[2] = { x,y };
+			int predictedClass = network.predict(input);
+
+			//std::cout << x << "," << y << "   :" << predictedClass << "\n";
+
+			Pen^ pen;
+			switch (predictedClass) { //ilgili class'a gore renk ayarlar.
+			case 0: pen = gcnew Pen(Color::Black, 1.5f); break;
+			case 1: pen = gcnew Pen(Color::Red, 1.5f); break;
+			case 2: pen = gcnew Pen(Color::Blue, 1.5f); break;
+			case 3: pen = gcnew Pen(Color::Green, 1.5f); break;
+			case 4: pen = gcnew Pen(Color::Yellow, 1.5f); break;
+			case 5: pen = gcnew Pen(Color::Orange, 1.5f); break;
+			default: pen = gcnew Pen(Color::YellowGreen, 1.5f);
+			}
+
+			int xValue = x + (coordinate->Width / 2);
+			int yValue = -y + (coordinate->Height / 2);
+			g->DrawLine(pen, xValue - 5, yValue + 5, xValue + 5, yValue);
+		}
+	}
+
+	coordinate->Image = surface;
 }
 };
 }
