@@ -4,6 +4,9 @@
 #include <fstream>
 #include <string>
 
+#include <ctime>
+#include <chrono>
+
 //NORMALIZASYON YAPMAZ!
 
 //#define DEBUG
@@ -110,6 +113,11 @@ public:
 	void saveWeights()
 	{
 		std::ofstream file("weight_values(multilayer).txt");
+		file << layerCount << "\n";
+		for (int i = 0; i < layerCount; i++)
+		{
+			file << LayerNeuronCounts[i] << "\n";
+		}
 		for (int i = 0; i < totalHnSize; i++)
 			file << Neurons[i] << "\n";
 		file << "END\n";
@@ -125,81 +133,12 @@ public:
 	{
 		inputs = inp;
 	}
-	void printInputs()
-	{
-		std::cout << "-------INPUTS-----\n";
-		for (int ind = 0; ind < inputCount; ind++)
-		{
-			for (int d = 0; d < dimension + 1; d++)
-			{
-				std::cout << inputs[ind + d * inputCount] << "  ";
-			}
-			std::cout << "\n";
-		}
-		std::cout << "-------------------\n";
-	}
+	
 
 	void initializeArray(float* array, int size)
 	{
 		for (int i = 0; i < size; i++)
 			array[i] = 0;
-	}
-
-	int predict(float* input)
-	{
-
-		float* net = new float[totalBiasSize];
-		float* fnet = new float[totalBiasSize];
-
-		//FIRST LAYER FF
-		for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
-		{
-			int indeks = ni + LayerBStartInd[0]; //ilk layerin bias indeksi
-
-			net[indeks] = 0;
-			for (int d = 0; d < dimension; d++)
-				net[indeks] += input[d] * Neurons[ni + LayerNeuronCounts[0] * d];
-
-			net[indeks] += bias[indeks];
-
-			fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
-		}
-
-		//NEXT LAYERS FF
-		for (int layer = 1; layer < layerCount; layer++)
-		{
-			for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
-			{
-				int indeks = ni + LayerBStartInd[layer];
-
-				net[indeks] = 0;
-				for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
-					net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
-					*
-					Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baþlangýç offset
-
-				net[indeks] += bias[indeks];
-				fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
-			}
-		}
-
-
-		int outputLayer = layerCount - 1;
-
-		int minVal = LayerBStartInd[0];
-		int min = 0;
-
-		for (int o = 1; o < LayerNeuronCounts[outputLayer]; o++) {
-			int indeks = o + LayerBStartInd[outputLayer];
-			if (fnet[indeks] > minVal)
-			{
-				min = o;
-				minVal = fnet[indeks];
-			}
-			std::cout << o << ": " << fnet[indeks] << "\n";
-		}
-		return min;
-
 	}
 
 	int StartLearning(float minErr, float maxEpoch, float lc)
@@ -216,6 +155,7 @@ public:
 		float* errors = new float[totalBiasSize];
 
 		int cycle = 0;
+		auto zamanbaslangic = std::chrono::high_resolution_clock::now();
 		while (cycle < maxEpoch && !isFinished) //error fix.
 		{
 			totalErr = 0;
@@ -353,6 +293,10 @@ public:
 			}
 		}
 
+		auto zamanbitis = std::chrono::high_resolution_clock::now();
+		auto toplam_zaman = std::chrono::duration_cast<std::chrono::nanoseconds>(zamanbitis - zamanbaslangic);
+		double islemsuresi = toplam_zaman.count() * 0.000000001;
+		std::cout << "Training completed in: " << islemsuresi << " seconds!\n";
 		std::cout << "Finished in " << cycle << " cycle, with " << totalErr / inputCount << " error.\n";
 		return cycle;
 	}

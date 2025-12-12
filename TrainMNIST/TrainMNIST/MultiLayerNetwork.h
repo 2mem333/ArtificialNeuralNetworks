@@ -7,6 +7,9 @@
 
 #include <csignal>
 
+#include <ctime>
+#include <chrono>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DLOG(msg) std::cout << msg 
@@ -88,22 +91,6 @@ public:
 		delete[] std;
 	}
 
-	void showStatus()
-	{
-		std::cout << "Hidden layer count: " << layerCount << "\n";
-		std::cout << "Bias array size: " << totalBiasSize << "\n";
-		std::cout << "Neuron array size: " << totalHnSize << "\n\n";
-
-		for (int layer = 0; layer < layerCount; layer++)
-		{
-			std::cout << "Layer " << layer << ": " << LayerStartsInd[layer] << "   " <<
-				LayerSizes[layer] + LayerStartsInd[layer] - 1 << "\n";
-			std::cout << "Neuron Count: " << LayerNeuronCounts[layer] << "\n";
-			std::cout << "Bias start ind: " << LayerBStartInd[layer] << "\n\n";
-		}
-
-	}
-
 	//AÐIRLIKLARIN DEÐERLERÝ RANDOM BAÞLATILMALI
 	//EÐER HEPSÝ AYNI KALIRSA, AYNI INPUT,TUREV,GRADYANT YUZUNDEN NORONLARIN AGIRLIKLARI HEP AYNI OLUR
 	void initializeWeights()
@@ -132,7 +119,7 @@ public:
 
 	int readMnistFiles(std::ifstream &Mnist_inputs, std::ifstream &Mnist_labels)
 	{
-		std::cout << "\nReading mnist files.\n";
+		std::cout << "\nReading mnist files.";
 		if (!Mnist_inputs || !Mnist_labels) {
 			std::cout << "Mnist files are not available.\n";
 			return -1;
@@ -147,12 +134,12 @@ public:
 		uint32_t magic_lbl = readBE(Mnist_labels);
 		uint32_t count_lbl = readBE(Mnist_labels);
 
-		std::cout << "magic_img =" << magic_img << "\n";
+	/*	std::cout << "magic_img =" << magic_img << "\n";
 		std::cout << "count_img =" << count_img << "\n";
 		std::cout << "rows      =" << rows << "\n";
 		std::cout << "cols      =" << cols << "\n";
 		std::cout << "magic_lbl =" << magic_lbl << "\n";
-		std::cout << "count_lbl =" << count_lbl << "\n\n";
+		std::cout << "count_lbl =" << count_lbl << "\n\n";*/
 
 		// -----------------------------
 		if (magic_img != 2051) { std::cout << "images magic wrong\n"; return -1; }
@@ -178,20 +165,6 @@ public:
 			inputs.push_back(label);
 		}
 		std::cout << "Done reading mnist files!\n";
-	}
-
-	void printInputs()
-	{
-		std::cout << "-------INPUTS-----\n";
-		for (int ind = 0; ind < inputCount; ind++)
-		{
-			for (int d = 0; d < dimension + 1; d++)
-			{
-				std::cout << inputs[ind + d * inputCount] << "  ";
-			}
-			std::cout << "\n";
-		}
-		std::cout << "-------------------\n";
 	}
 
 	float* normalizeInputs()
@@ -230,20 +203,6 @@ public:
 
 		return normalized;
 	}
-	float* changeInputMatris()
-	{
-		float* normalized = new float[inputCount * dimension];
-
-		for (int inputIndeks = 0; inputIndeks < inputCount; inputIndeks++) {
-			for (int i = 0; i < dimension; i++) {
-				//burada normalized inputunu kendi veri yapýmýz olan matrise çeviririz...
-				normalized[inputIndeks + i * inputCount] = (int)inputs[i + inputIndeks * (dimension + 1)];
-			}
-		}
-
-		return normalized;
-
-	}
 
 	void initializeArray(float* array, int size)
 	{
@@ -279,120 +238,12 @@ public:
 		file.close();
 	}
 
-	void readWeightsFromTxt(std::ifstream& file)
-	{
-		if (!file)
-			return;
-
-		std::string line;
-		float value;
-		for (int d = 0; d < dimension; d++)
-		{
-			std::getline(file, line);
-			value = std::stof(line);
-			mean[d] = value;
-			std::getline(file, line);
-			value = std::stof(line);
-			std[d] = value;
-		}
-		std::getline(file, line); //SKIP END
-		if (line == "END") {
-			std::cout << "Mean std readed.\n";
-		}
-
-		for (int i = 0; i < totalHnSize; i++)
-		{
-			std::getline(file, line);
-			value = std::stof(line);
-			Neurons[i] = value;
-		}
-		std::getline(file, line); //SKIP END
-		if (line == "END") {
-			std::cout << "Weights readed.\n";
-		}
-
-		for (int i = 0; i < totalBiasSize; i++)
-		{
-			std::getline(file, line);
-			value = std::stof(line);
-			bias[i] = value;
-		}
-
-		std::getline(file, line); //SKIP END
-		if (line == "END") {
-			std::cout << "Bias readed.\n";
-		}
-
-		file.close();
-	}
-
-
-	/*
-!!!!!!!!!!!!! WARNING  !!!!!!!!!!!!
-THE INPUT'S MATRIS DESIGN WHICH GIVEN TO THE PREDICT FUNCTION IS DIFFERENT THAN THIS CLASS'S.
-		*/
-	void predict(float* input)
-	{
-
-		for (int d = 0; d < dimension; d++) //normalize input
-			input[d] = (input[d] - mean[d]) / std[d];
-
-
-		float* net = new float[totalBiasSize];
-		float* fnet = new float[totalBiasSize];
-
-		//FIRST LAYER FF
-		for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
-		{
-			int indeks = ni + LayerBStartInd[0]; //ilk layerin bias indeksi
-
-			net[indeks] = 0;
-			for (int d = 0; d < dimension; d++)
-				net[indeks] += input[d] * Neurons[ni + LayerNeuronCounts[0] * d];
-
-			net[indeks] += bias[indeks];
-
-			fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
-		}
-
-		//NEXT LAYERS FF
-		for (int layer = 1; layer < layerCount; layer++)
-		{
-			for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
-			{
-				int indeks = ni + LayerBStartInd[layer];
-
-				net[indeks] = 0;
-				for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
-					net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
-					*
-					Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baþlangýç offset
-
-				net[indeks] += bias[indeks];
-				fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
-			}
-		}
-
-
-		int outputLayer = layerCount - 1;
-
-		for (int o = 0; o < LayerNeuronCounts[outputLayer]; o++) {
-			int indeks = o + LayerBStartInd[outputLayer];
-			std::cout << o << ": " << fnet[indeks] << "\n";
-		}
-
-	}
-
-	int StartLearning(float minErr, float maxEpoch, float lc,bool normalize = 1)
+	int StartLearning(float minErr, float maxEpoch, float lc)
 	{
 		if (layerCount < 2)
 			return -1;
 
-		float* normalizedSamples;
-		if (!normalize)
-		normalizedSamples = changeInputMatris();
-		else
-		normalizedSamples = normalizeInputs();
+		float *normalizedSamples = normalizeInputs();
 
 		bool isFinished = false;
 		float totalErr = 0;
@@ -404,16 +255,12 @@ THE INPUT'S MATRIS DESIGN WHICH GIVEN TO THE PREDICT FUNCTION IS DIFFERENT THAN 
 
 		int cycle = 0;
 
+		auto zamanbaslangic = std::chrono::high_resolution_clock::now();
 		while (cycle < maxEpoch && !isFinished)
 		{
 			totalErr = 0;
 			for (int inputInd = 0; inputInd < inputCount; inputInd++)
 			{
-				//initializeArray(errors, totalBiasSize);
-				//initializeArray(fnetDer, totalBiasSize);
-				//initializeArray(fnet, totalBiasSize);
-				//initializeArray(net, totalBiasSize);
-
 				//FIRST LAYER FF
 				for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
 				{
@@ -544,6 +391,10 @@ THE INPUT'S MATRIS DESIGN WHICH GIVEN TO THE PREDICT FUNCTION IS DIFFERENT THAN 
 			}
 		}
 
+		auto zamanbitis = std::chrono::high_resolution_clock::now();
+		auto toplam_zaman = std::chrono::duration_cast<std::chrono::nanoseconds>(zamanbitis - zamanbaslangic);
+		double islemsuresi = toplam_zaman.count() * 0.000000001;
+		std::cout << "Training completed in: " << islemsuresi << " seconds!\n";
 		std::cout << "Finished with error: " << totalErr / inputCount << "\n";
 		std::cout << "Total cycle: " << cycle << "\n";
 

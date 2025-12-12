@@ -99,6 +99,7 @@ namespace TrainMNIST {
 	private: System::Windows::Forms::Button^ button4;
 	private: System::Windows::Forms::Button^ button6;
 	private: System::Windows::Forms::Button^ button5;
+	private: System::Windows::Forms::Label^ label23;
 	protected:
 
 	private:
@@ -148,6 +149,7 @@ namespace TrainMNIST {
 			this->label14 = (gcnew System::Windows::Forms::Label());
 			this->panel1 = (gcnew System::Windows::Forms::Panel());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
+			this->button6 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->label22 = (gcnew System::Windows::Forms::Label());
 			this->textBox21 = (gcnew System::Windows::Forms::TextBox());
@@ -166,7 +168,7 @@ namespace TrainMNIST {
 			this->label15 = (gcnew System::Windows::Forms::Label());
 			this->button4 = (gcnew System::Windows::Forms::Button());
 			this->button5 = (gcnew System::Windows::Forms::Button());
-			this->button6 = (gcnew System::Windows::Forms::Button());
+			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->panel1->SuspendLayout();
 			this->panel2->SuspendLayout();
 			this->SuspendLayout();
@@ -225,7 +227,7 @@ namespace TrainMNIST {
 			this->textBox7->Name = L"textBox7";
 			this->textBox7->Size = System::Drawing::Size(102, 22);
 			this->textBox7->TabIndex = 23;
-			this->textBox7->Text = L"5,5";
+			this->textBox7->Text = L"64,10";
 			// 
 			// label29
 			// 
@@ -415,7 +417,7 @@ namespace TrainMNIST {
 			this->textBox13->Name = L"textBox13";
 			this->textBox13->Size = System::Drawing::Size(95, 22);
 			this->textBox13->TabIndex = 36;
-			this->textBox13->Text = L"32,784";
+			this->textBox13->Text = L"500,784";
 			// 
 			// label11
 			// 
@@ -504,6 +506,7 @@ namespace TrainMNIST {
 			// panel2
 			// 
 			this->panel2->BackColor = System::Drawing::SystemColors::ActiveBorder;
+			this->panel2->Controls->Add(this->label23);
 			this->panel2->Controls->Add(this->button6);
 			this->panel2->Controls->Add(this->button3);
 			this->panel2->Controls->Add(this->label22);
@@ -540,9 +543,19 @@ namespace TrainMNIST {
 			this->panel2->Size = System::Drawing::Size(628, 438);
 			this->panel2->TabIndex = 48;
 			// 
+			// button6
+			// 
+			this->button6->Location = System::Drawing::Point(494, 69);
+			this->button6->Name = L"button6";
+			this->button6->Size = System::Drawing::Size(41, 23);
+			this->button6->TabIndex = 51;
+			this->button6->Text = L"...";
+			this->button6->UseVisualStyleBackColor = true;
+			this->button6->Click += gcnew System::EventHandler(this, &Main::button6_Click);
+			// 
 			// button3
 			// 
-			this->button3->Location = System::Drawing::Point(470, 352);
+			this->button3->Location = System::Drawing::Point(470, 383);
 			this->button3->Name = L"button3";
 			this->button3->Size = System::Drawing::Size(114, 35);
 			this->button3->TabIndex = 61;
@@ -553,11 +566,11 @@ namespace TrainMNIST {
 			// label22
 			// 
 			this->label22->AutoSize = true;
-			this->label22->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+			this->label22->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->label22->Location = System::Drawing::Point(309, 49);
 			this->label22->Name = L"label22";
-			this->label22->Size = System::Drawing::Size(119, 17);
+			this->label22->Size = System::Drawing::Size(117, 16);
 			this->label22->TabIndex = 60;
 			this->label22->Text = L"Encoder weights:";
 			// 
@@ -571,7 +584,7 @@ namespace TrainMNIST {
 			// 
 			// textBox15
 			// 
-			this->textBox15->Location = System::Drawing::Point(482, 277);
+			this->textBox15->Location = System::Drawing::Point(482, 308);
 			this->textBox15->Name = L"textBox15";
 			this->textBox15->Size = System::Drawing::Size(102, 22);
 			this->textBox15->TabIndex = 47;
@@ -582,7 +595,7 @@ namespace TrainMNIST {
 			this->label16->AutoSize = true;
 			this->label16->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label16->Location = System::Drawing::Point(346, 281);
+			this->label16->Location = System::Drawing::Point(346, 312);
 			this->label16->Name = L"label16";
 			this->label16->Size = System::Drawing::Size(108, 20);
 			this->label16->TabIndex = 48;
@@ -593,7 +606,7 @@ namespace TrainMNIST {
 			this->label17->AutoSize = true;
 			this->label17->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label17->Location = System::Drawing::Point(346, 310);
+			this->label17->Location = System::Drawing::Point(346, 341);
 			this->label17->Name = L"label17";
 			this->label17->Size = System::Drawing::Size(122, 20);
 			this->label17->TabIndex = 49;
@@ -601,7 +614,7 @@ namespace TrainMNIST {
 			// 
 			// textBox16
 			// 
-			this->textBox16->Location = System::Drawing::Point(482, 308);
+			this->textBox16->Location = System::Drawing::Point(482, 339);
 			this->textBox16->Name = L"textBox16";
 			this->textBox16->Size = System::Drawing::Size(102, 22);
 			this->textBox16->TabIndex = 50;
@@ -609,7 +622,7 @@ namespace TrainMNIST {
 			// 
 			// textBox17
 			// 
-			this->textBox17->Location = System::Drawing::Point(476, 178);
+			this->textBox17->Location = System::Drawing::Point(476, 209);
 			this->textBox17->Name = L"textBox17";
 			this->textBox17->Size = System::Drawing::Size(110, 22);
 			this->textBox17->TabIndex = 55;
@@ -620,7 +633,7 @@ namespace TrainMNIST {
 			this->label18->AutoSize = true;
 			this->label18->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label18->Location = System::Drawing::Point(371, 149);
+			this->label18->Location = System::Drawing::Point(371, 180);
 			this->label18->Name = L"label18";
 			this->label18->Size = System::Drawing::Size(92, 20);
 			this->label18->TabIndex = 54;
@@ -631,7 +644,7 @@ namespace TrainMNIST {
 			this->label19->AutoSize = true;
 			this->label19->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label19->Location = System::Drawing::Point(371, 178);
+			this->label19->Location = System::Drawing::Point(371, 209);
 			this->label19->Name = L"label19";
 			this->label19->Size = System::Drawing::Size(28, 20);
 			this->label19->TabIndex = 56;
@@ -639,7 +652,7 @@ namespace TrainMNIST {
 			// 
 			// textBox18
 			// 
-			this->textBox18->Location = System::Drawing::Point(476, 149);
+			this->textBox18->Location = System::Drawing::Point(476, 180);
 			this->textBox18->Name = L"textBox18";
 			this->textBox18->Size = System::Drawing::Size(110, 22);
 			this->textBox18->TabIndex = 53;
@@ -650,7 +663,7 @@ namespace TrainMNIST {
 			this->label20->AutoSize = true;
 			this->label20->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label20->Location = System::Drawing::Point(371, 119);
+			this->label20->Location = System::Drawing::Point(371, 150);
 			this->label20->Name = L"label20";
 			this->label20->Size = System::Drawing::Size(73, 20);
 			this->label20->TabIndex = 52;
@@ -658,7 +671,7 @@ namespace TrainMNIST {
 			// 
 			// textBox19
 			// 
-			this->textBox19->Location = System::Drawing::Point(476, 119);
+			this->textBox19->Location = System::Drawing::Point(476, 150);
 			this->textBox19->Name = L"textBox19";
 			this->textBox19->Size = System::Drawing::Size(110, 22);
 			this->textBox19->TabIndex = 51;
@@ -666,7 +679,7 @@ namespace TrainMNIST {
 			// 
 			// textBox20
 			// 
-			this->textBox20->Location = System::Drawing::Point(476, 211);
+			this->textBox20->Location = System::Drawing::Point(476, 242);
 			this->textBox20->Name = L"textBox20";
 			this->textBox20->Size = System::Drawing::Size(110, 22);
 			this->textBox20->TabIndex = 57;
@@ -677,7 +690,7 @@ namespace TrainMNIST {
 			this->label21->AutoSize = true;
 			this->label21->Font = (gcnew System::Drawing::Font(L"Century Gothic", 9, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
-			this->label21->Location = System::Drawing::Point(371, 211);
+			this->label21->Location = System::Drawing::Point(371, 242);
 			this->label21->Name = L"label21";
 			this->label21->Size = System::Drawing::Size(96, 20);
 			this->label21->TabIndex = 58;
@@ -712,15 +725,18 @@ namespace TrainMNIST {
 			this->button5->TabIndex = 50;
 			this->button5->Text = L"...";
 			this->button5->UseVisualStyleBackColor = true;
+			this->button5->Click += gcnew System::EventHandler(this, &Main::button5_Click);
 			// 
-			// button6
+			// label23
 			// 
-			this->button6->Location = System::Drawing::Point(494, 69);
-			this->button6->Name = L"button6";
-			this->button6->Size = System::Drawing::Size(41, 23);
-			this->button6->TabIndex = 51;
-			this->button6->Text = L"...";
-			this->button6->UseVisualStyleBackColor = true;
+			this->label23->AutoSize = true;
+			this->label23->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label23->Location = System::Drawing::Point(309, 120);
+			this->label23->Name = L"label23";
+			this->label23->Size = System::Drawing::Size(129, 16);
+			this->label23->TabIndex = 62;
+			this->label23->Text = L"Multi-layer options";
 			// 
 			// Main
 			// 
@@ -887,7 +903,31 @@ private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e
 	network.saveWeights();
 }
 private: System::Void button4_Click(System::Object^ sender, System::EventArgs^ e) {
+	OpenFileDialog^ ofd = gcnew OpenFileDialog();
+	ofd->Filter = "All files (*.*)|*.*";
 
+	if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+	{
+		textBox1->Text = ofd->FileName;
+	}
+}
+private: System::Void button5_Click(System::Object^ sender, System::EventArgs^ e) {
+	OpenFileDialog^ ofd = gcnew OpenFileDialog();
+	ofd->Filter = "All files (*.*)|*.*";
+
+	if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+	{
+		textBox2->Text = ofd->FileName;
+	}
+}
+private: System::Void button6_Click(System::Object^ sender, System::EventArgs^ e) {
+	OpenFileDialog^ ofd = gcnew OpenFileDialog();
+	ofd->Filter = "All files (*.*)|*.*";
+
+	if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
+	{
+		textBox3->Text = ofd->FileName;
+	}
 }
 };
 }

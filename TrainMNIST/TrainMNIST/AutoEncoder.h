@@ -5,6 +5,9 @@
 #include <fstream>
 #include <vector>
 
+#include <ctime>
+#include <chrono>
+
 //#define DEBUG
 #ifdef DEBUG
 #define DLOG(msg) std::cout << msg 
@@ -134,7 +137,11 @@ public:
 	void saveWeights()
 	{
 		std::ofstream file("weight_values(autoencoder).txt");
-
+		file << layerCount << "\n";
+		for (int i = 0; i < layerCount; i++)
+		{
+			file << LayerNeuronCounts[i] << "\n";
+		}
 		for (int d = 0; d < dimension; d++)
 		{
 			file << mean[d] << "\n";
@@ -164,7 +171,7 @@ public:
 
 	int readMnistFiles(std::ifstream& Mnist_inputs, std::ifstream& Mnist_labels)
 	{
-		std::cout << "\nReading mnist files.\n";
+		std::cout << "\nReading mnist files.";
 		if (!Mnist_inputs || !Mnist_labels) {
 			std::cout << "Mnist files are not available.\n";
 			return -1;
@@ -179,12 +186,12 @@ public:
 		uint32_t magic_lbl = readBE(Mnist_labels);
 		uint32_t count_lbl = readBE(Mnist_labels);
 
-		std::cout << "magic_img =" << magic_img << "\n";
-		std::cout << "count_img =" << count_img << "\n";
-		std::cout << "rows      =" << rows << "\n";
-		std::cout << "cols      =" << cols << "\n";
-		std::cout << "magic_lbl =" << magic_lbl << "\n";
-		std::cout << "count_lbl =" << count_lbl << "\n\n";
+		//std::cout << "magic_img =" << magic_img << "\n";
+		//std::cout << "count_img =" << count_img << "\n";
+		//std::cout << "rows      =" << rows << "\n";
+		//std::cout << "cols      =" << cols << "\n";
+		//std::cout << "magic_lbl =" << magic_lbl << "\n";
+		//std::cout << "count_lbl =" << count_lbl << "\n\n";
 
 		// -----------------------------
 		if (magic_img != 2051) { std::cout << "images magic wrong\n"; return -1; }
@@ -378,6 +385,7 @@ public:
 		float* errors = new float[totalBiasSize];
 
 		int cycle = 0;
+		auto zamanbaslangic = std::chrono::high_resolution_clock::now();
 		while (cycle < maxEpoch && !isFinished)
 		{
 			totalErr = 0;
@@ -511,6 +519,10 @@ public:
 			}
 		}
 
+		auto zamanbitis = std::chrono::high_resolution_clock::now();
+		auto toplam_zaman = std::chrono::duration_cast<std::chrono::nanoseconds>(zamanbitis - zamanbaslangic);
+		double islemsuresi = toplam_zaman.count() * 0.000000001;
+		std::cout << "Training completed in: " << islemsuresi << " seconds!\n";
 		std::cout << "Finished in " << cycle << " cycle, with " << totalErr / inputCount << " error.\n";
 		return cycle;
 	}
