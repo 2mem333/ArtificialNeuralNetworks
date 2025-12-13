@@ -213,7 +213,7 @@ public:
 	void saveWeights()
 	{
 		std::ofstream file("weight_values(multilayer).txt");
-
+		file << dimension << "\n";
 		file << layerCount << "\n";
 		for (int i = 0; i < layerCount; i++)
 		{

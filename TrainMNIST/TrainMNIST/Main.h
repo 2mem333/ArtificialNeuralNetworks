@@ -926,7 +926,7 @@ private: System::Void button6_Click(System::Object^ sender, System::EventArgs^ e
 
 	if (ofd->ShowDialog() == System::Windows::Forms::DialogResult::OK)
 	{
-		textBox3->Text = ofd->FileName;
+		textBox21->Text = ofd->FileName;
 	}
 }
 };

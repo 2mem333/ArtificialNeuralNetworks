@@ -113,6 +113,7 @@ public:
 	void saveWeights()
 	{
 		std::ofstream file("weight_values(multilayer).txt");
+		file << dimension << "\n";
 		file << layerCount << "\n";
 		for (int i = 0; i < layerCount; i++)
 		{
@@ -301,39 +302,4 @@ public:
 		return cycle;
 	}
 
-	void loadWeights(std::ifstream& file) {
-		if (!file.is_open()) {
-			std::cout << "File could not be opened!\n";
-			return;
-		}
-
-		std::string line;
-		float value;
-
-		// ---- WEIGHTS ----
-		for (int i = 0; i < totalHnSize; i++) {
-			if (!std::getline(file, line)) break;
-			value = std::stof(line);
-			Neurons[i] = value;
-		}
-
-		// Skip END line
-		std::getline(file, line);
-		if (line == "END")
-			std::cout << "Weights read.\n";
-
-		// ---- BIASES ----
-		for (int i = 0; i < totalBiasSize; i++) {
-			if (!std::getline(file, line)) break;
-			value = std::stof(line);
-			bias[i] = value;
-		}
-
-		// Skip END line
-		std::getline(file, line);
-		if (line == "END")
-			std::cout << "Bias read.\n";
-
-		std::cout << "Done reading weights!\n";
-	}
 };

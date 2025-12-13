@@ -137,6 +137,7 @@ public:
 	void saveWeights()
 	{
 		std::ofstream file("weight_values(autoencoder).txt");
+		file << dimension << "\n";
 		file << layerCount << "\n";
 		for (int i = 0; i < layerCount; i++)
 		{
@@ -536,7 +537,8 @@ public:
 		std::string line;
 		float value;
 
-		//SKIP LAYER INFORMATIONS
+		//SKIP LAYER,DIM INFORMATIONS
+		std::getline(file, line);
 		std::getline(file, line);
 		int layerCount = std::stof(line);
 
