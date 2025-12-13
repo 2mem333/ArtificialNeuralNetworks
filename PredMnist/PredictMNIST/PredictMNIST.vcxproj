@@ -124,7 +124,8 @@
     <ClInclude Include="Main.h">
       <FileType>CppForm</FileType>
     </ClInclude>
-    <ClInclude Include="MultiLayerNetwork.h" />
+    <ClInclude Include="neuronStruct.h" />
+    <ClInclude Include="predictFunctions.h" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Main.resx">

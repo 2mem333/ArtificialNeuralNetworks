@@ -1,6 +1,8 @@
 #pragma once
 #include <iostream>
 #include <algorithm>
+#include "neuronStruct.h"
+#include "predictFunctions.h"
 
 namespace PredictMNIST {
 
@@ -27,28 +29,9 @@ namespace PredictMNIST {
 	private:
 		/// UDV User Defined Variables
 
-		int *LayerNeuronCounts;
-		int layerCount;
-
-		float* input = new float[28*28];
-
-		float* Neurons;
-		float* bias;
-
-		int* LayerSizes;
-		int* LayerStartsInd; //neurons dizisi icinde her bir layerin start indeksi
-		int* LayerBStartInd;
-
-		float totalHnSize;
-		float totalBiasSize;
-
-		int dimension = 784;
-
-		float* mean;
-		float* std;
-		bool isNormalized;
-
-		bool weightsLoaded = false;
+		NeuronStruct* neuron = new NeuronStruct[2];
+		bool inputChange = false;
+		float* input = new float[28 * 28];
 
 
 	private: System::Windows::Forms::RichTextBox^ richTextBox1;
@@ -69,6 +52,10 @@ namespace PredictMNIST {
 	private: System::Windows::Forms::Label^ label19;
 	private: System::Windows::Forms::Label^ label18;
 	private: System::Windows::Forms::Label^ label17;
+	private: System::Windows::Forms::CheckBox^ checkBox1;
+	private: System::Windows::Forms::Button^ loadEncoderWeights;
+	private: System::Windows::Forms::Label^ label13;
+
 
 
 
@@ -181,9 +168,12 @@ namespace PredictMNIST {
 			this->label15 = (gcnew System::Windows::Forms::Label());
 			this->panel4 = (gcnew System::Windows::Forms::Panel());
 			this->panel5 = (gcnew System::Windows::Forms::Panel());
+			this->label13 = (gcnew System::Windows::Forms::Label());
 			this->label19 = (gcnew System::Windows::Forms::Label());
 			this->label18 = (gcnew System::Windows::Forms::Label());
 			this->label17 = (gcnew System::Windows::Forms::Label());
+			this->checkBox1 = (gcnew System::Windows::Forms::CheckBox());
+			this->loadEncoderWeights = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox1))->BeginInit();
 			this->panel1->SuspendLayout();
 			this->panel2->SuspendLayout();
@@ -199,7 +189,7 @@ namespace PredictMNIST {
 			this->LoadInput->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->LoadInput->ForeColor = System::Drawing::Color::White;
-			this->LoadInput->Location = System::Drawing::Point(306, 233);
+			this->LoadInput->Location = System::Drawing::Point(308, 279);
 			this->LoadInput->Name = L"LoadInput";
 			this->LoadInput->Size = System::Drawing::Size(174, 36);
 			this->LoadInput->TabIndex = 2;
@@ -475,7 +465,7 @@ namespace PredictMNIST {
 			this->loadWeights->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
 				static_cast<System::Byte>(162)));
 			this->loadWeights->ForeColor = System::Drawing::Color::White;
-			this->loadWeights->Location = System::Drawing::Point(306, 275);
+			this->loadWeights->Location = System::Drawing::Point(308, 237);
 			this->loadWeights->Name = L"loadWeights";
 			this->loadWeights->Size = System::Drawing::Size(174, 36);
 			this->loadWeights->TabIndex = 23;
@@ -663,13 +653,14 @@ namespace PredictMNIST {
 				static_cast<System::Int32>(static_cast<System::Byte>(40)));
 			this->panel4->Location = System::Drawing::Point(306, 31);
 			this->panel4->Name = L"panel4";
-			this->panel4->Size = System::Drawing::Size(174, 195);
+			this->panel4->Size = System::Drawing::Size(174, 174);
 			this->panel4->TabIndex = 38;
 			// 
 			// panel5
 			// 
 			this->panel5->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(30)), static_cast<System::Int32>(static_cast<System::Byte>(30)),
 				static_cast<System::Int32>(static_cast<System::Byte>(30)));
+			this->panel5->Controls->Add(this->label13);
 			this->panel5->Controls->Add(this->label19);
 			this->panel5->Controls->Add(this->label18);
 			this->panel5->Controls->Add(this->label17);
@@ -677,8 +668,20 @@ namespace PredictMNIST {
 			this->panel5->Controls->Add(this->label15);
 			this->panel5->Location = System::Drawing::Point(308, 33);
 			this->panel5->Name = L"panel5";
-			this->panel5->Size = System::Drawing::Size(170, 191);
+			this->panel5->Size = System::Drawing::Size(170, 170);
 			this->panel5->TabIndex = 39;
+			// 
+			// label13
+			// 
+			this->label13->AutoSize = true;
+			this->label13->Font = (gcnew System::Drawing::Font(L"Century Gothic", 8, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label13->ForeColor = System::Drawing::Color::White;
+			this->label13->Location = System::Drawing::Point(3, 56);
+			this->label13->Name = L"label13";
+			this->label13->Size = System::Drawing::Size(95, 19);
+			this->label13->TabIndex = 43;
+			this->label13->Text = L"Dimension: 0";
 			// 
 			// label19
 			// 
@@ -715,6 +718,35 @@ namespace PredictMNIST {
 			this->label17->Size = System::Drawing::Size(0, 19);
 			this->label17->TabIndex = 40;
 			// 
+			// checkBox1
+			// 
+			this->checkBox1->AutoSize = true;
+			this->checkBox1->ForeColor = System::Drawing::SystemColors::ButtonHighlight;
+			this->checkBox1->Location = System::Drawing::Point(308, 213);
+			this->checkBox1->Name = L"checkBox1";
+			this->checkBox1->Size = System::Drawing::Size(111, 20);
+			this->checkBox1->TabIndex = 40;
+			this->checkBox1->Text = L"Use encoded";
+			this->checkBox1->UseVisualStyleBackColor = true;
+			this->checkBox1->CheckedChanged += gcnew System::EventHandler(this, &Main::checkBox1_CheckedChanged);
+			// 
+			// loadEncoderWeights
+			// 
+			this->loadEncoderWeights->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(58)),
+				static_cast<System::Int32>(static_cast<System::Byte>(58)), static_cast<System::Int32>(static_cast<System::Byte>(58)));
+			this->loadEncoderWeights->Enabled = false;
+			this->loadEncoderWeights->FlatStyle = System::Windows::Forms::FlatStyle::Popup;
+			this->loadEncoderWeights->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Regular, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->loadEncoderWeights->ForeColor = System::Drawing::Color::White;
+			this->loadEncoderWeights->Location = System::Drawing::Point(420, 211);
+			this->loadEncoderWeights->Name = L"loadEncoderWeights";
+			this->loadEncoderWeights->Size = System::Drawing::Size(60, 23);
+			this->loadEncoderWeights->TabIndex = 41;
+			this->loadEncoderWeights->Text = L"Load Input from file";
+			this->loadEncoderWeights->UseVisualStyleBackColor = false;
+			this->loadEncoderWeights->Click += gcnew System::EventHandler(this, &Main::loadEncoderWeights_Click);
+			// 
 			// Main
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(120, 120);
@@ -722,6 +754,8 @@ namespace PredictMNIST {
 			this->BackColor = System::Drawing::Color::FromArgb(static_cast<System::Int32>(static_cast<System::Byte>(30)), static_cast<System::Int32>(static_cast<System::Byte>(30)),
 				static_cast<System::Int32>(static_cast<System::Byte>(30)));
 			this->ClientSize = System::Drawing::Size(1146, 487);
+			this->Controls->Add(this->loadEncoderWeights);
+			this->Controls->Add(this->checkBox1);
 			this->Controls->Add(this->panel5);
 			this->Controls->Add(this->panel4);
 			this->Controls->Add(this->panel3);
@@ -751,103 +785,74 @@ namespace PredictMNIST {
 		}
 #pragma endregion
 
-	private: System::Void loadWeights_Click(System::Object^ sender, System::EventArgs^ e) {
-
-		if (weightsLoaded)
-		{
-			delete[] mean; mean = nullptr;
-			delete[] std; std = nullptr;
-			delete[] LayerSizes; LayerSizes = nullptr;
-			delete[] LayerStartsInd; LayerStartsInd = nullptr;
-			delete[] LayerBStartInd; LayerBStartInd = nullptr;
-			delete[]LayerNeuronCounts; LayerNeuronCounts = nullptr;
-
-			delete[] Neurons; Neurons = nullptr;
-			delete[] bias; bias = nullptr;
-
+		private: System::Void checkBox1_CheckedChanged(System::Object^ sender, System::EventArgs^ e) {
+			loadEncoderWeights->Enabled = checkBox1->Checked;
 		}
 
+	private: System::Void loadWeights_Click(System::Object^ sender, System::EventArgs^ e) {
 
 		OpenFileDialog^ o = gcnew OpenFileDialog();
-		o->Filter = "Metin Dosyasý (*.txt)|*.txt";
+		o->Filter = "Txt dosya (*.txt)|*.txt";
 
 		if (o->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			if (neuron[0].weightsLoaded)
+			{
+				neuron[0].deinit();
+			}
+
 			System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(o->FileName);
 
 			String^ line;
 			line = sr->ReadLine();
-			layerCount = System::Convert::ToInt32(line);
-			LayerNeuronCounts = new int[layerCount];
+			int dimension = System::Convert::ToInt32(line);
 
-			for(int i = 0; i < layerCount; i++)
+			line = sr->ReadLine();
+			neuron[0].layerCount = System::Convert::ToInt32(line);
+			neuron[0].LayerNeuronCounts = new int[neuron[0].layerCount];
+
+			for (int i = 0; i < neuron[0].layerCount; i++)
 			{
 				line = sr->ReadLine();
-				LayerNeuronCounts[i] = System::Convert::ToInt32(line);
-			} 
+				neuron[0].LayerNeuronCounts[i] = System::Convert::ToInt32(line);
+			}
 
-
-		LayerSizes = new int[layerCount];
-		LayerStartsInd = new int[layerCount];
-		LayerBStartInd = new int[layerCount];
-
-		LayerSizes[0] = dimension * LayerNeuronCounts[0];
-		totalHnSize = LayerSizes[0];
-		totalBiasSize = LayerNeuronCounts[0];
-		LayerStartsInd[0] = 0;
-		LayerBStartInd[0] = 0;
-
-
-		for (int layer = 1; layer < layerCount; layer++)
-		{
-			LayerSizes[layer] = LayerNeuronCounts[layer - 1] * LayerNeuronCounts[layer];
-
-			LayerStartsInd[layer] = totalHnSize;
-			totalHnSize += LayerSizes[layer];
-
-			LayerBStartInd[layer] = totalBiasSize;
-			totalBiasSize += LayerNeuronCounts[layer];
-
-		}
-
-		Neurons = new float[totalHnSize];
-		bias = new float[totalBiasSize];
-
-		mean = new float[784];
-		std = new float[784];
-
-	
+			neuron[0].initialize(dimension);
 
 			float value;
-			for (int d = 0; d < dimension; d++)
-			{
-				line = sr->ReadLine();
-				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				mean[d] = value;
-				line = sr->ReadLine();
-				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				std[d] = value;
-			}
-			line = sr->ReadLine(); //SKIP END
-			if (line == "END") {
-				std::cout << "Mean std readed.\n";
+
+			//EGER ENCODER ILE KULLANMIYORSAK, MULTI LAYER EGITIM VERILERINI DAHIL ET.
+			if (checkBox1->Checked == false) {
+				for (int d = 0; d < neuron[0].dimension; d++)
+				{
+					line = sr->ReadLine();
+					value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+					neuron[0].mean[d] = value;
+					line = sr->ReadLine();
+					value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+					neuron[0].std[d] = value;
+				}
+				line = sr->ReadLine(); //SKIP END
+				if (line == "END") {
+					std::cout << "Mean std readed.\n";
+				}
 			}
 
-			for (int i = 0; i < totalHnSize; i++)
+			for (int i = 0; i < neuron[0].totalHnSize; i++)
 			{
 				line = sr->ReadLine();
 				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				Neurons[i] = value;
+				neuron[0].Neurons[i] = value;
 			}
 			line = sr->ReadLine(); //SKIP END
 			if (line == "END") {
 				std::cout << "Weights readed.\n";
 			}
 
-			for (int i = 0; i < totalBiasSize; i++)
+			for (int i = 0; i < neuron[0].totalBiasSize; i++)
 			{
 				line = sr->ReadLine();
 				value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
-				bias[i] = value;
+				neuron[0].bias[i] = value;
 			}
 
 			line = sr->ReadLine(); //SKIP END
@@ -859,29 +864,29 @@ namespace PredictMNIST {
 
 			label15->Text = "True";
 			label15->ForeColor = Color::Green;
-			weightsLoaded = true;
+			neuron[0].weightsLoaded = true;
 
-			label18->Text = "Layer Count: " + layerCount.ToString();;
+			label18->Text = "Layer Count: " + neuron[0].layerCount.ToString();;
 			label19->Text = "Neurons: ";
 
-			for (int i = 0; i < layerCount; i++)
+			for (int i = 0; i < neuron[0].layerCount; i++)
 			{
-				label19->Text += "{" + LayerNeuronCounts[i] + "} ";
+				label19->Text += "{" + neuron[0].LayerNeuronCounts[i] + "} ";
 			}
 
+			label13->Text = "Dimension: " + dimension.ToString();
 			std::cout << "Done reading weights!\n";
 
 		}
 	}
 
 	private: System::Void LoadInput_Click(System::Object^ sender, System::EventArgs^ e) {
-		if (input) { delete[] input; input = nullptr; }
-		input = new float[784];
-
 		OpenFileDialog^ o = gcnew OpenFileDialog();
 		o->Filter = "Metin Dosyasý (*.txt)|*.txt";
 
 		if (o->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+			if (input) { delete[] input; input = nullptr; }
+			input = new float[784];
 
 			System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(o->FileName);
 
@@ -897,7 +902,7 @@ namespace PredictMNIST {
 
 			sr->Close();
 
-			isNormalized = false;
+			inputChange = true;
 
 			richTextBox1->Clear();
 			for (int y = 0; y < 28; y++)
@@ -908,209 +913,332 @@ namespace PredictMNIST {
 			std::cout << "Done reading input!\n";
 		}
 	}
-private: System::Void Predict_Click(System::Object^ sender, System::EventArgs^ e) {
+	private: System::Void Predict_Click(System::Object^ sender, System::EventArgs^ e) {
 
-	if (!weightsLoaded)
-		return;
+		if (!inputChange)
+			return;
 
-	if (isNormalized)
-	{
-		for (int d = 0; d < 784; d++) //normalize input
-			input[d] = (input[d] - mean[d]) / std[d];
-		isNormalized = true;
-	}
+		if (!neuron[0].weightsLoaded)
+			return;
 
-	float* net = new float[totalBiasSize];
-	float* fnet = new float[totalBiasSize];
+		if (checkBox1->Checked == false) {
 
-	//FIRST LAYER FF
-	for (int ni = 0; ni < LayerNeuronCounts[0]; ni++)
-	{
-		int indeks = ni + LayerBStartInd[0]; //ilk layerin bias indeksi
+				for (int d = 0; d < 784; d++) //normalize input
+					input[d] = (input[d] - neuron[0].mean[d]) / neuron[0].std[d];
 
-		net[indeks] = 0;
-		for (int d = 0; d < dimension; d++)
-			net[indeks] += input[d] * Neurons[ni + LayerNeuronCounts[0] * d];
+			PREDICT p;
+			p.initialize(input,&neuron[0]);
 
-		net[indeks] += bias[indeks];
+			float* fnet = p.start_predict();
+			int outputLayer = neuron[0].layerCount - 1;
 
-		fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
-	}
+			for (int o = 0; o < neuron[0].LayerNeuronCounts[outputLayer]; o++) {
+				int indeks = o + neuron[0].LayerBStartInd[outputLayer];
 
-	//NEXT LAYERS FF
-	for (int layer = 1; layer < layerCount; layer++)
-	{
-		for (int ni = 0; ni < LayerNeuronCounts[layer]; ni++)
-		{
-			int indeks = ni + LayerBStartInd[layer];
+				float accuarity = (1 + fnet[indeks]) / 2 * 100;
+				int shade = 128 + (int)(accuarity / 100.0f * 127);
+				System::Drawing::Color col =
+					System::Drawing::Color::FromArgb(shade, shade, shade);
 
-			net[indeks] = 0;
-			for (int d = 0; d < LayerNeuronCounts[layer - 1]; d++) //ERROR FIX
-				net[indeks] += fnet[d + LayerBStartInd[layer - 1]] //onceki katmanin aktivasyonu
-				*
-				Neurons[ni + LayerNeuronCounts[layer] * d + LayerStartsInd[layer]];//ni + neuroncount*d + baþlangýç offset
 
-			net[indeks] += bias[indeks];
-			fnet[indeks] = ((2.0f / ((float)1.0f + exp(-net[indeks]))) - 1.0f);
+				std::cout << "Number: " << o << " : " << accuarity << "\n";
+				switch (o)
+				{
+				case 0:
+					value0->Text = "%" + System::Convert::ToString(accuarity);
+					value0->ForeColor = col;
+					break;
+				case 1:
+					value1->Text = "%" + System::Convert::ToString(accuarity);
+					value1->ForeColor = col;
+					break;
+				case 2:
+					value2->Text = "%" + System::Convert::ToString(accuarity);
+					value2->ForeColor = col;
+					break;
+				case 3:
+					value3->Text = "%" + System::Convert::ToString(accuarity);
+					value3->ForeColor = col;
+					break;
+				case 4:
+					value4->Text = "%" + System::Convert::ToString(accuarity);
+					value4->ForeColor = col;
+					break;
+				case 5:
+					value5->Text = "%" + System::Convert::ToString(accuarity);
+					value5->ForeColor = col;
+					break;
+				case 6:
+					value6->Text = "%" + System::Convert::ToString(accuarity);
+					value6->ForeColor = col;
+					break;
+				case 7:
+					value7->Text = "%" + System::Convert::ToString(accuarity);
+					value7->ForeColor = col;
+					break;
+				case 8:
+					value8->Text = "%" + System::Convert::ToString(accuarity);
+					value8->ForeColor = col;
+					break;
+				case 9:
+					value9->Text = "%" + System::Convert::ToString(accuarity);
+					value9->ForeColor = col;
+					break;
+				}
+			}
+			std::cout << "\n";
 		}
-	}
-
-	int outputLayer = layerCount - 1;
-
-	for (int o = 0; o < LayerNeuronCounts[outputLayer]; o++) {
-		int indeks = o + LayerBStartInd[outputLayer];
-
-		float accuarity = (1 + fnet[indeks]) / 2 * 100;
-		int shade = 128 + (int)(accuarity / 100.0f * 127);
-		System::Drawing::Color col =
-			System::Drawing::Color::FromArgb(shade, shade, shade);
-
-
-		std::cout << "Number: " << o << " : " << accuarity << "\n";
-		switch (o)
+		else //ENCODER PREDICTI YAPILIR
 		{
-		case 0:
-			value0->Text = "%" + System::Convert::ToString(accuarity);
-			value0->ForeColor = col;
-			break;
-		case 1:
-			value1->Text = "%" + System::Convert::ToString(accuarity);
-			value1->ForeColor = col;
-			break;
-		case 2:
-			value2->Text = "%" + System::Convert::ToString(accuarity);
-			value2->ForeColor = col;
-			break;
-		case 3:
-			value3->Text = "%" + System::Convert::ToString(accuarity);
-			value3->ForeColor = col;
-			break;
-		case 4:
-			value4->Text = "%" + System::Convert::ToString(accuarity);
-			value4->ForeColor = col;
-			break;
-		case 5:
-			value5->Text = "%" + System::Convert::ToString(accuarity);
-			value5->ForeColor = col;
-			break;
-		case 6:
-			value6->Text = "%" + System::Convert::ToString(accuarity);
-			value6->ForeColor = col;
-			break;
-		case 7:
-			value7->Text = "%" + System::Convert::ToString(accuarity);
-			value7->ForeColor = col;
-			break;
-		case 8:
-			value8->Text = "%" + System::Convert::ToString(accuarity);
-			value8->ForeColor = col;
-			break;
-		case 9:
-			value9->Text = "%" + System::Convert::ToString(accuarity);
-			value9->ForeColor = col;
-			break;
+			if (!neuron[1].weightsLoaded)
+				return;
+
+			for (int d = 0; d < 784; d++) //encoderin degerleri ile normalize edilir.
+				input[d] = (input[d] - neuron[1].mean[d]) / neuron[1].std[d];
+
+			float* encodedInput = EncodeInput(input,&neuron[1]);
+
+			PREDICT p;
+			p.initialize(encodedInput, &neuron[0]);
+
+			float* fnet = p.start_predict();
+			int outputLayer = neuron[0].layerCount - 1;
+
+			for (int o = 0; o < neuron[0].LayerNeuronCounts[outputLayer]; o++) {
+				int indeks = o + neuron[0].LayerBStartInd[outputLayer];
+
+				float accuarity = (1 + fnet[indeks]) / 2 * 100;
+				int shade = 128 + (int)(accuarity / 100.0f * 127);
+				System::Drawing::Color col =
+					System::Drawing::Color::FromArgb(shade, shade, shade);
+
+				std::cout << "Number: " << o << " : " << accuarity << "\n";
+				switch (o)
+				{
+				case 0:
+					value0->Text = "%" + System::Convert::ToString(accuarity);
+					value0->ForeColor = col;
+					break;
+				case 1:
+					value1->Text = "%" + System::Convert::ToString(accuarity);
+					value1->ForeColor = col;
+					break;
+				case 2:
+					value2->Text = "%" + System::Convert::ToString(accuarity);
+					value2->ForeColor = col;
+					break;
+				case 3:
+					value3->Text = "%" + System::Convert::ToString(accuarity);
+					value3->ForeColor = col;
+					break;
+				case 4:
+					value4->Text = "%" + System::Convert::ToString(accuarity);
+					value4->ForeColor = col;
+					break;
+				case 5:
+					value5->Text = "%" + System::Convert::ToString(accuarity);
+					value5->ForeColor = col;
+					break;
+				case 6:
+					value6->Text = "%" + System::Convert::ToString(accuarity);
+					value6->ForeColor = col;
+					break;
+				case 7:
+					value7->Text = "%" + System::Convert::ToString(accuarity);
+					value7->ForeColor = col;
+					break;
+				case 8:
+					value8->Text = "%" + System::Convert::ToString(accuarity);
+					value8->ForeColor = col;
+					break;
+				case 9:
+					value9->Text = "%" + System::Convert::ToString(accuarity);
+					value9->ForeColor = col;
+					break;
+				}
+			}
+			std::cout << "\n";
 		}
+
+		inputChange = false;
+
 	}
-	std::cout << "\n";
+	private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (input) { delete[] input; input = nullptr; }
+		input = new float[784];
 
-}
-private: System::Void button1_Click(System::Object^ sender, System::EventArgs^ e) {
-	if (input) { delete[] input; input = nullptr; }
-	input = new float[784];
+		String^ line = richTextBox1->Text->Trim();
+		array<String^>^ parts = line->Split(' ');
 
-	String^ line = richTextBox1->Text->Trim();
-	array<String^>^ parts = line->Split(' ');
-
-	for (int i = 0; i < 784; i++)
-	{
-		input[i] = float::Parse(parts[i],
-			System::Globalization::CultureInfo::InvariantCulture);
-	}
-
-	isNormalized = false;
-
-	pictureBox1->Invalidate(); // Çizimi yenile
-
-	std::cout << "Done reading input!\n";
-}
-
-
-bool isDrawing = false;
-private: System::Void pictureBox1_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
-	Graphics^ g = e->Graphics;
-	g->FillRectangle(Brushes::Black, 0, 0, 280, 280);
-
-	for (int y = 0; y < 28; y++)
-	{
-		for (int x = 0; x < 28; x++)
+		for (int i = 0; i < 784; i++)
 		{
-			int val = input[x+y*28];
-			Color c = Color::FromArgb(val, val, val);
-			Brush^ b = gcnew SolidBrush(c);
-			g->FillRectangle(b, x * 10, y * 10, 10, 10);
+			input[i] = float::Parse(parts[i],
+				System::Globalization::CultureInfo::InvariantCulture);
 		}
+
+		inputChange = true;
+
+		pictureBox1->Invalidate(); // Çizimi yenile
+
+		std::cout << "Done reading input!\n";
 	}
-	
-}
-private: System::Void pictureBox1_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-	isDrawing = true;
-}
-private: System::Void pictureBox1_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-	if (!isDrawing) return;
 
-	int px = e->X / 10;
-	int py = e->Y / 10;
 
-	if (px < 0 || px >= 28 || py < 0 || py >= 28)
-		return;
+		   bool isDrawing = false;
+	private: System::Void pictureBox1_Paint(System::Object^ sender, System::Windows::Forms::PaintEventArgs^ e) {
+		Graphics^ g = e->Graphics;
+		g->FillRectangle(Brushes::Black, 0, 0, 280, 280);
 
-	int radius = 1;
-
-	for (int dy = -radius; dy <= radius; dy++)
-	{
-		for (int dx = -radius; dx <= radius; dx++)
+		for (int y = 0; y < 28; y++)
 		{
-			int xx = px + dx;
-			int yy = py + dy;
-
-			if (xx >= 0 && xx < 28 && yy >= 0 && yy < 28)
+			for (int x = 0; x < 28; x++)
 			{
-				int dist = Math::Abs(dx) + Math::Abs(dy);
-				int addVal = 40 - dist * 15;
-
-				if (addVal < 0) addVal = 0;
-
-				input[xx + yy*28] = std::min(input[xx + yy * 28] + addVal, 255.0f);
+				int val = input[x + y * 28];
+				Color c = Color::FromArgb(val, val, val);
+				Brush^ b = gcnew SolidBrush(c);
+				g->FillRectangle(b, x * 10, y * 10, 10, 10);
 			}
 		}
+
 	}
-	//std::cout << "deneme";
-	pictureBox1->Invalidate();
-}
-private: System::Void pictureBox1_MouseUp(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
-	isDrawing = false;
-}
+	private: System::Void pictureBox1_MouseDown(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		isDrawing = true;
+	}
+	private: System::Void pictureBox1_MouseMove(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		if (!isDrawing) return;
 
+		int px = e->X / 10;
+		int py = e->Y / 10;
 
-private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
+		if (px < 0 || px >= 28 || py < 0 || py >= 28)
+			return;
 
-	richTextBox1->Clear();
-	for (int y = 0; y < 28; y++)
-		for (int x = 0; x < 28; x++) {
-			richTextBox1->AppendText(System::Convert::ToString(input[y * 28 + x]) + " ");
+		int radius = 1;
+
+		for (int dy = -radius; dy <= radius; dy++)
+		{
+			for (int dx = -radius; dx <= radius; dx++)
+			{
+				int xx = px + dx;
+				int yy = py + dy;
+
+				if (xx >= 0 && xx < 28 && yy >= 0 && yy < 28)
+				{
+					int dist = Math::Abs(dx) + Math::Abs(dy);
+					int addVal = 40 - dist * 15;
+
+					if (addVal < 0) addVal = 0;
+
+					input[xx + yy * 28] = std::min(input[xx + yy * 28] + addVal, 255.0f);
+				}
+			}
 		}
+		//std::cout << "deneme";
+		pictureBox1->Invalidate();
+	}
+	private: System::Void pictureBox1_MouseUp(System::Object^ sender, System::Windows::Forms::MouseEventArgs^ e) {
+		isDrawing = false;
+		inputChange = true;
+	}
 
-	std::cout << "Loaded input from drawing!\n";
-}
-private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
-	for (int i = 0; i < 784; i++)
+
+	private: System::Void button2_Click(System::Object^ sender, System::EventArgs^ e) {
+
+		richTextBox1->Clear();
+		for (int y = 0; y < 28; y++)
+			for (int x = 0; x < 28; x++) {
+				richTextBox1->AppendText(System::Convert::ToString(input[y * 28 + x]) + " ");
+			}
+
+		std::cout << "Loaded input from drawing!\n";
+	}
+	private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e) {
+		for (int i = 0; i < 784; i++)
 			input[i] = 0;
 
-	pictureBox1->Invalidate(); // ekraný yeniden çiz
-}
-private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
-	for (int i = 0; i < 784; i++)
-		input[i] = 0;
+		pictureBox1->Invalidate(); // ekraný yeniden çiz
+	}
+	private: System::Void Main_Load(System::Object^ sender, System::EventArgs^ e) {
+		for (int i = 0; i < 784; i++)
+			input[i] = 0;
+	}
+
+private: System::Void loadEncoderWeights_Click(System::Object^ sender, System::EventArgs^ e) {
+
+	OpenFileDialog^ o = gcnew OpenFileDialog();
+	o->Filter = "Txt dosya (*.txt)|*.txt";
+
+	if (o->ShowDialog() == System::Windows::Forms::DialogResult::OK) {
+		if (neuron[1].weightsLoaded)
+		{
+			neuron[1].deinit();
+		}
+
+		System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(o->FileName);
+
+		String^ line;
+		line = sr->ReadLine();
+		int dimension = System::Convert::ToInt32(line);
+		line = sr->ReadLine();
+		neuron[1].layerCount = System::Convert::ToInt32(line);
+		neuron[1].LayerNeuronCounts = new int[neuron[1].layerCount];
+
+		for (int i = 0; i < neuron[1].layerCount; i++)
+		{
+			line = sr->ReadLine();
+			neuron[1].LayerNeuronCounts[i] = System::Convert::ToInt32(line);
+		}
+
+		neuron[1].initialize(dimension);
+
+
+		float value;
+		for (int d = 0; d < neuron[1].dimension; d++)
+		{
+			line = sr->ReadLine();
+			value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+			neuron[1].mean[d] = value;
+			line = sr->ReadLine();
+			value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+			neuron[1].std[d] = value;
+		}
+		line = sr->ReadLine(); //SKIP END
+		if (line == "END") {
+			std::cout << "Mean std readed.\n";
+		}
+
+		for (int i = 0; i < neuron[1].totalHnSize; i++)
+		{
+			line = sr->ReadLine();
+			value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+			neuron[1].Neurons[i] = value;
+		}
+		line = sr->ReadLine(); //SKIP END
+		if (line == "END") {
+			std::cout << "Weights readed.\n";
+		}
+
+		for (int i = 0; i < neuron[1].totalBiasSize; i++)
+		{
+			line = sr->ReadLine();
+			value = float::Parse(line, System::Globalization::CultureInfo::InvariantCulture);
+			neuron[1].bias[i] = value;
+		}
+
+		line = sr->ReadLine(); //SKIP END
+		if (line == "END") {
+			std::cout << "Bias readed.\n";
+		}
+
+		sr->Close();
+
+
+		neuron[1].weightsLoaded = true;
+
+
+		std::cout << "Done reading encoder weights!\n";
+
+	}
 }
 
 };
