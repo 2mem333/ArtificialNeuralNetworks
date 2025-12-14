@@ -41,6 +41,9 @@
     <ClInclude Include="MultiLayerNetwork.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="RegressionSingleLayer.h">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Manifest Include="app.manifest" />

@@ -31,6 +31,8 @@ public:
 	int dimension = 1;
 	int inputCount;
 
+	info i;
+
 	float* mean;
 	float* std;
 
@@ -253,25 +255,16 @@ public:
 		float* ONfnet = new float[onCount];
 		float* ONfnetDer = new float[onCount];
 		float* errors = new float[onCount];
+		
+		float* errorList = new float[maxEpoch];
 
 		float* normalizedSamples = normalizeInputs();
-
-		//std::cout << "-------norm_Samples-----\n";
-		//for (int ind = 0; ind < inputCount; ind++)
-		//{
-		//	for (int d = 0; d < dimension + 1; d++)
-		//	{
-		//		std::cout << normalizedSamples[ind + d * inputCount] << "  ";
-		//	}
-		//	std::cout << "\n";
-		//}
-		//std::cout << "-------------------\n";
 
 
 		int cycle = 0;
 		bool isFinished = false;
 		float totalErr = 0;
-
+		auto zamanbaslangic = std::chrono::high_resolution_clock::now();
 		while (!isFinished && cycle != maxEpoch) {
 			totalErr = 0;
 			for (int inputInd = 0; inputInd < inputCount; inputInd++)
@@ -360,16 +353,24 @@ public:
 				isFinished = true;
 				std::cout << "Finished in " << cycle << " cycle!!\n";
 				std::cout << "Error: " << totalErr / inputCount << "\n";
-				return info{ totalErr / inputCount,cycle };
 			}
 			else
 			{
+				errorList[cycle] = totalErr / inputCount;
 				cycle++;
 			}
 		}
 
 		std::cout << "Unsucessfully finished in " << cycle << " cycle!!\n";
 		std::cout << "Error: " << totalErr / inputCount << "\n";
-		return info{ totalErr / inputCount,cycle };
+		auto zamanbitis = std::chrono::high_resolution_clock::now();
+		auto toplam_zaman = std::chrono::duration_cast<std::chrono::nanoseconds>(zamanbitis - zamanbaslangic);
+		double islemsuresi = toplam_zaman.count() * 0.000000001;
+
+		i.error = totalErr / inputCount;
+		i.cycle = cycle;
+		i.time = islemsuresi;
+		i.errorList = errorList;
+		return i;
 	}
 };

@@ -15,14 +15,14 @@
 
 
 
-class SingleLayerNetwork {
+class RegressionSingleLayer {
 public:
 	float* weights;
 
 	float* inputs;
 	int inputCount;
 	float* bias;
-	int dimension;
+	int dimension = 1;
 
 	int classCount = 1;
 
@@ -32,13 +32,12 @@ public:
 	float* mean;
 	float* std;
 
-	SingleLayerNetwork(int d, int ic, int cc)
+	RegressionSingleLayer(int ic, int cc)
 	{
 		classCount = cc;
-		dimension = d;
 		inputCount = ic;
-		inputs = new float[ic * (d + 1)]; //EKSTRADAN 1 BOSLUK, LABEL ÝÇÝN
-		weights = new float[cc * d]; //TOPLAMDA CLASS COUNT KADAR NÖRON OLUR
+		inputs = new float[ic * (3)]; //EKSTRADAN 1 BOSLUK, LABEL ÝÇÝN
+		weights = new float[cc * dimension]; //TOPLAMDA CLASS COUNT KADAR NÖRON OLUR
 		bias = new float[cc];
 	}
 
@@ -88,13 +87,14 @@ public:
 
 	float* normalizeInputs()
 	{
-		float* normalized = new float[inputCount * dimension];
-		mean = new float[dimension];
-		std = new float[dimension];
+		int tempDim = dimension + 1; //X VE Y DEGERLERINI NORMALIZE ETMEK ICIN, NORMALDE DIM = 1 oluyor.
 
-		//CALCULATE MEAN
+		float* normalized = new float[inputCount * tempDim];
 
-		for (int i = 0; i < dimension; i++)
+		mean = new float[tempDim];
+		std = new float[tempDim];
+
+		for (int i = 0; i < tempDim; i++)
 		{
 			mean[i] = 0.0f;
 			for (int inputIndeks = 0; inputIndeks < inputCount; inputIndeks++)
@@ -105,7 +105,7 @@ public:
 		}
 
 		//CALCULATE STANDART VARIATION
-		for (int i = 0; i < dimension; i++) {
+		for (int i = 0; i < tempDim; i++) {
 			std[i] = 0.0f;
 			for (int inputIndeks = 0; inputIndeks < inputCount; inputIndeks++) {
 				float diff = inputs[inputIndeks + i * inputCount] - mean[i];
@@ -117,12 +117,47 @@ public:
 
 		//APPLY NORMALIZATION
 		for (int inputIndeks = 0; inputIndeks < inputCount; inputIndeks++) {
-			for (int i = 0; i < dimension; i++) {
+			for (int i = 0; i < tempDim; i++) {
 				normalized[inputIndeks + i * inputCount] = (inputs[inputIndeks + i * inputCount] - mean[i]) / std[i];
 			}
 		}
 
 		return normalized;
+	}
+
+	void denormalizeWeights()
+	{
+		for (int neuronInd = 0; neuronInd < classCount; neuronInd++) {
+			for (int d = 0; d < dimension; d++)
+			{
+				bias[neuronInd] -= weights[neuronInd + classCount * d] * mean[d] / std[d];
+				weights[neuronInd + classCount * d] = weights[neuronInd + classCount * d] / std[d];
+			}
+		}
+		std::cout << "Weigths are denormalized\n";
+	}
+
+	int predict(int x)
+	{
+		float* net = new float[classCount]; //calculate net for every neuron
+		float* fnet = new float[classCount]; //calculate net for every neuron
+		float* fnetDer = new float[classCount]; //calculate net for every neuron
+
+		for (int neuronInd = 0; neuronInd < classCount; neuronInd++)
+		{
+			net[neuronInd] = 0.0f;
+			for (int d = 0; d < dimension; d++)
+				net[neuronInd] += x * weights[classCount * d + neuronInd];
+
+			//LINEER AKTIVASYON (RESRESYON ICIN BOYLEDIR)
+			net[neuronInd] += bias[neuronInd];
+			fnet[neuronInd] = net[neuronInd];
+
+			fnetDer[neuronInd] = 1;
+		}
+
+
+		return net[0] * std[1] + mean[1];
 	}
 
 	info StartLearning(float minError, float maxEpoch)
@@ -156,23 +191,19 @@ public:
 					for (int d = 0; d < dimension; d++)
 						net[neuronInd] += norm_Samples[inputCount * d + inputInd] * weights[classCount * d + neuronInd];
 
+					//LINEER AKTIVASYON (RESRESYON ICIN BOYLEDIR)
 					net[neuronInd] += bias[neuronInd];
-					fnet[neuronInd] = ((2.0f / ((float)1.0f + exp(-net[neuronInd]))) - 1.0f); //HATALI INFINITY DONDURUYOR
-					//fnet[neuronInd] = tanh(net[neuronInd]);
-
-					fnetDer[neuronInd] = (0.5f * (1.0f - fnet[neuronInd] * fnet[neuronInd]));
-					//fnetDer[neuronInd] = 1 - fnet[neuronInd] * fnet[neuronInd];
+					fnet[neuronInd] = net[neuronInd]; 
+	
+					fnetDer[neuronInd] = 1;
 				}
 
 				//backward
 				for (int neuronInd = 0; neuronInd < classCount; neuronInd++)
 				{
-					if (inputs[inputInd + dimension * inputCount] == neuronInd)
-						desired[neuronInd] = 1;
-					else
-						desired[neuronInd] = -1;
+					float desired = norm_Samples[inputInd + 1 * inputCount];
+					err[neuronInd] = desired - fnet[neuronInd];
 
-					err[neuronInd] = desired[neuronInd] - fnet[neuronInd];
 					delta[neuronInd] = lc * err[neuronInd] * fnetDer[neuronInd];
 
 					for (int d = 0; d < dimension; d++)
@@ -214,16 +245,16 @@ public:
 		for (int neuronInd = 0; neuronInd < classCount; neuronInd++) {
 			for (int d = 0; d < dimension; d++)
 			{
-				orgWeights[neuronInd + classCount*d] = weights[neuronInd + classCount * d] / std[d];
+				orgWeights[neuronInd + classCount * d] = weights[neuronInd + classCount * d] / std[d];
 			}
 		}
 
 		return orgWeights;
 	}
 
-	float *returnBias()
+	float* returnBias()
 	{
-		float *orgBias = new float[classCount];
+		float* orgBias = new float[classCount];
 		for (int neuronInd = 0; neuronInd < classCount; neuronInd++) {
 			orgBias[neuronInd] = bias[neuronInd];
 			for (int d = 0; d < dimension; d++) //[HATA_FIX] normalde inputlarda kayma olabiliyordu nedeni buradaki bias denormalize hatasindanmis.
