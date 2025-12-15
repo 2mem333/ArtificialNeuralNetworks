@@ -149,6 +149,7 @@ namespace TrainMNIST {
 			this->label14 = (gcnew System::Windows::Forms::Label());
 			this->panel1 = (gcnew System::Windows::Forms::Panel());
 			this->panel2 = (gcnew System::Windows::Forms::Panel());
+			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->button6 = (gcnew System::Windows::Forms::Button());
 			this->button3 = (gcnew System::Windows::Forms::Button());
 			this->label22 = (gcnew System::Windows::Forms::Label());
@@ -168,7 +169,6 @@ namespace TrainMNIST {
 			this->label15 = (gcnew System::Windows::Forms::Label());
 			this->button4 = (gcnew System::Windows::Forms::Button());
 			this->button5 = (gcnew System::Windows::Forms::Button());
-			this->label23 = (gcnew System::Windows::Forms::Label());
 			this->panel1->SuspendLayout();
 			this->panel2->SuspendLayout();
 			this->SuspendLayout();
@@ -543,6 +543,17 @@ namespace TrainMNIST {
 			this->panel2->Size = System::Drawing::Size(628, 438);
 			this->panel2->TabIndex = 48;
 			// 
+			// label23
+			// 
+			this->label23->AutoSize = true;
+			this->label23->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
+				static_cast<System::Byte>(162)));
+			this->label23->Location = System::Drawing::Point(309, 120);
+			this->label23->Name = L"label23";
+			this->label23->Size = System::Drawing::Size(129, 16);
+			this->label23->TabIndex = 62;
+			this->label23->Text = L"Multi-layer options";
+			// 
 			// button6
 			// 
 			this->button6->Location = System::Drawing::Point(494, 69);
@@ -727,17 +738,6 @@ namespace TrainMNIST {
 			this->button5->UseVisualStyleBackColor = true;
 			this->button5->Click += gcnew System::EventHandler(this, &Main::button5_Click);
 			// 
-			// label23
-			// 
-			this->label23->AutoSize = true;
-			this->label23->Font = (gcnew System::Drawing::Font(L"Century Gothic", 7.8F, System::Drawing::FontStyle::Bold, System::Drawing::GraphicsUnit::Point,
-				static_cast<System::Byte>(162)));
-			this->label23->Location = System::Drawing::Point(309, 120);
-			this->label23->Name = L"label23";
-			this->label23->Size = System::Drawing::Size(129, 16);
-			this->label23->TabIndex = 62;
-			this->label23->Text = L"Multi-layer options";
-			// 
 			// Main
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(8, 16);
@@ -752,7 +752,8 @@ namespace TrainMNIST {
 			this->Controls->Add(this->label1);
 			this->Controls->Add(this->textBox1);
 			this->Name = L"Main";
-			this->Text = L"Main";
+			this->ShowIcon = false;
+			this->Text = L"Train MNIST";
 			this->panel1->ResumeLayout(false);
 			this->panel1->PerformLayout();
 			this->panel2->ResumeLayout(false);
@@ -872,10 +873,12 @@ private: System::Void button3_Click(System::Object^ sender, System::EventArgs^ e
 	int inputCount = System::Convert::ToInt32(textBox20->Text);
 
 	std::ifstream fileEncoder(msclr::interop::marshal_as<std::string>(textBox21->Text));
-	System::IO::StreamReader^ sr =
-		gcnew System::IO::StreamReader(textBox21->Text);
 
-	String^ line = sr->ReadLine();
+	System::IO::StreamReader^ sr = gcnew System::IO::StreamReader(textBox21->Text); //hatali
+
+
+	String^ line = sr->ReadLine(); //skip dimension
+	line = sr->ReadLine();
 	int layerCount_ = System::Convert::ToInt32(line);
 
 	int *LayerNeuronCounts_ = new int[layerCount_];
